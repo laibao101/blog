@@ -1,0 +1,33 @@
+{
+    "name": "antd-blog",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "antd": "^3.2.3",
+        "body-parser": "^1.18.2",
+        "cors": "^2.8.4",
+        "excel-export": "^0.5.1",
+        "express": "^4.16.2",
+        "express-mysql-session": "^1.2.3",
+        "express-session": "^1.15.6",
+        "isomorphic-unfetch": "^2.0.0",
+        "md5": "^2.2.1",
+        "moment": "^2.21.0",
+        "mysql-pro": "^1.0.1",
+        "passport": "^0.4.0",
+        "passport-local": "^1.0.0",
+        "react": "^16.2.0",
+        "react-dom": "^16.2.0",
+        "react-router-dom": "^4.2.2",
+        "react-scripts": "1.1.1",
+        "uuid": "^3.2.1"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject",
+        "server": "node server/app"
+    },
+    "proxy": "http://localhost:5000"
+}
