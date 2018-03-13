@@ -327,8 +327,7 @@ router.post('/category', async (req, res, next) => {
         });
     }
     try {
-        const categoryId = getUuid();
-        body.categoryId = categoryId;
+        body.categoryId = getUuid();
         const result = await Category.insertCategory(body);
         if (result.insertId) {
             return res.json({

@@ -36,9 +36,16 @@ const getPostsTotal = () => {
     return connect.query(getPostsTotalSql, []);
 };
 
+const likePostSql = `UPDATE posts SET posts.like = posts.like + 1 where posts.id = ?`;
+const likePost = (id) => {
+    const connect = getConnection();
+    return connect.query(likePostSql, [id]);
+};
+
 module.exports = {
     getPosts,
     insertPost,
+    likePost,
     getPost,
     updatePost,
     deletePost,

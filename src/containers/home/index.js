@@ -1,45 +1,47 @@
 import React from "react";
-import {Card, Icon, List, Pagination, notification} from "antd";
-import moment from "moment";
-import Http from "../../util/Http";
+import {Card, Icon, List, Pagination, notification, Spin, Tooltip} from "antd";
+import {connect} from 'react-redux';
 import {Link, withRouter} from "react-router-dom";
+import {getTableList, like} from '../../action/home';
+import {Time, QueryString} from "../../util";
 
 class Home extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            loading: false,
             current: 1,
-            total: 0,
-            list: []
         };
         this.limit = 5;
         this._paginateChange = this._paginateChange.bind(this);
     }
 
     componentWillMount() {
-        this._updateList();
+        const page = this._getPage();
+        this._updateList(page);
     }
 
-    _paginateChange(current) {
-        this.setState({
-            current,
-        }, () => {
-            this._updateList();
+    _paginateChange(nextPage) {
+        const page = this._getPage();
+        if(nextPage === page){
+            return;
+        }
+        this.props.history.push({
+            pathname: '/',
+            search: `?page=${nextPage}`
         });
+        this._updateList(nextPage);
     }
 
     _formatTime(time) {
         if (time === '0') {
             return '';
         }
-        return <span>{moment(Number(time)).format('YYYY-MM-DD HH:mm:ss')}</span>;
+        return <span>{Time.formatTime(time)}</span>;
     }
 
     async _addLike(id) {
         try {
-            const res = await this._submitLike({id});
-            console.log(res);
+            const res = await this.props.like({id});
             if (res.code === 0) {
                 notification.success({
                     message: '点赞成功',
@@ -55,31 +57,38 @@ class Home extends React.PureComponent {
         }
     }
 
-    async _updateList() {
-        try {
-            const res = await Http.get(`/blog/posts`, {page: this.state.current, limit: this.limit});
-            if (res.code === 0) {
-                this.setState({
-                    list: res.data.posts,
-                    total: res.data.total
-                });
-            }
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _updateList(page = 1) {
+        this.props.getTableList({
+            page,
+            limit: this.limit
+        });
     }
 
-    _submitLike(data) {
-        return Http.get('/blog/like', data);
+    _getPage() {
+        return parseInt(QueryString.getQueryString(this.props.location.search.substring(1)).page) || 1;
     }
 
     render() {
-        const {list} = this.state;
+        const page = this._getPage();
+        const {list = [], loading = false, total = 0} = this.props;
         return (
             <div>
+                {
+                    loading ? (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                zIndex: 9999,
+                                top: '50%',
+                                left: '48%'
+                            }}
+                        >
+                            <Spin tip="加载中..."/>
+                        </div>
+                    ) : null
+                }
                 <List grid={
                     {gutter: 16, column: 1}}
                       dataSource={list}
@@ -92,24 +101,33 @@ class Home extends React.PureComponent {
                                             <span>
                                                 <span>
                                                     <Icon type="info-circle"/>
-                                                    {item.title}</span>
-                                                <span className="ctime" style={{fontSize:'14px',marginLeft:30,color:'gray'}}>
+                                                    {item.title}
+                                                    </span>
+                                                <span className="ctime"
+                                                      style={{fontSize: '14px', marginLeft: 30, color: 'gray'}}>
                                                     <Icon
-                                                    type="calendar"/> 创建时间: {this._formatTime(item.ctime)}</span>
+                                                        type="calendar"/> 创建时间: {this._formatTime(item.ctime)}</span>
                                             </span>
                                         }
                                         actions={
                                             [
-                                                <div><Icon type="book"/> 分类:{item.categoryName}</div>,
+                                                <div>
+                                                    <Icon type="book"/> 分类:{item.categoryName}
+                                                </div>,
                                                 <div><Icon type="edit"/> 评论</div>,
-                                                <div
-                                                    onClick={() => this._addLike(item.id)}
+                                                <Tooltip
+                                                    arrowPointAtCenter
+                                                    title="老铁，点个赞咯"
                                                 >
-                                                    <Icon
-                                                        type="like"
-                                                    />
-                                                    {item.like}
-                                                </div>
+                                                    <div
+                                                        onClick={() => this._addLike(item.id)}
+                                                    >
+                                                        <Icon
+                                                            type="like"
+                                                        />
+                                                        {item.like}
+                                                    </div>
+                                                </Tooltip>
                                             ]
                                         }
                                         loading={!item.abstract}>
@@ -118,18 +136,24 @@ class Home extends React.PureComponent {
                               </List.Item>
                           )
                       }>
-                    {this.state.loading ? '加载中。。。' : ''}
                 </List>
-                <Pagination
-                    showQuickJumper
-                    current={this.state.current}
-                    total={this.state.total}
-                    pageSize={5}
-                    onChange={this._paginateChange}
-                />
+                {
+                    total < 1 ? null : (
+                        <Pagination
+                            showQuickJumper
+                            current={page}
+                            total={total}
+                            pageSize={5}
+                            onChange={this._paginateChange}
+                        />
+                    )
+                }
             </div>
         );
     }
 }
 
-export default withRouter(Home);
+export default connect(
+    state => state.home,
+    {getTableList, like}
+)(withRouter(Home));
