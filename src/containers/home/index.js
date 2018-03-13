@@ -20,18 +20,31 @@ class Home extends React.PureComponent {
         this._updateList(page);
     }
 
+    /**
+     * 翻页回调
+     * @param nextPage 下一页页数
+     * @private
+     */
     _paginateChange(nextPage) {
         const page = this._getPage();
-        if(nextPage === page){
+        // 如果点击的是相同页，不做操作
+        if (nextPage === page) {
             return;
         }
+        // 翻页后刷新列表
+        this._updateList(nextPage);
         this.props.history.push({
             pathname: '/',
             search: `?page=${nextPage}`
         });
-        this._updateList(nextPage);
     }
 
+    /**
+     * 格式化时间
+     * @param time 时间字符串
+     * @returns {object | string} ReactElement | 空字符串
+     * @private
+     */
     _formatTime(time) {
         if (time === '0') {
             return '';
@@ -39,6 +52,12 @@ class Home extends React.PureComponent {
         return <span>{Time.formatTime(time)}</span>;
     }
 
+    /**
+     * 点赞
+     * @param id 文章id
+     * @returns {Promise<void>}
+     * @private
+     */
     async _addLike(id) {
         try {
             const res = await this.props.like({id});
@@ -57,6 +76,11 @@ class Home extends React.PureComponent {
         }
     }
 
+    /**
+     * 更新列表
+     * @param page 当前页数
+     * @private
+     */
     _updateList(page = 1) {
         this.props.getTableList({
             page,
@@ -64,6 +88,11 @@ class Home extends React.PureComponent {
         });
     }
 
+    /**
+     * 获取当前页数
+     * @returns {number} 当前页数
+     * @private
+     */
     _getPage() {
         return parseInt(QueryString.getQueryString(this.props.location.search.substring(1)).page) || 1;
     }
