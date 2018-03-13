@@ -1,5 +1,5 @@
 const Router = require('express').Router;
-const Model = require('./model');
+const Post = require('../../models/post');
 
 const router = new Router();
 
@@ -7,8 +7,8 @@ router.get('/posts', async (req, res) => {
     try {
         const page = req.query.page - 1 || 0;
         const limit = req.query.limit || 5;
-        const posts = await Model.getPosts(page * limit, Number(limit));
-        const totalRes = await Model.getPostsTotal();
+        const posts = await Post.getPosts(page * limit, Number(limit));
+        const totalRes = await Post.getPostsTotal();
         res.send({
             code: 0,
             msg: '查询成功',
@@ -38,7 +38,7 @@ router.get('/post', async (req, res, next) => {
         });
     }
     try {
-        const post = await Model.getPost(postId);
+        const post = await Post.getPost(postId);
         return res.json({
             code: 0,
             msg: '获取post成功',
@@ -61,7 +61,7 @@ router.get('/like', async (req, res, next) => {
         });
     }
     try {
-        const result = await Model.likePost(id);
+        const result = await Post.likePost(id);
         if (result.affectedRows > 0) {
             await res.json({
                 code: 0,

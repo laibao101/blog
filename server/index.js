@@ -2,10 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MysqlStore = require('express-mysql-session')(session);
-const blog = require('./blog.router');
-const admin = require('./admin.router');
-const auth = require('./auth');
-const config = require('./config').mysql;
+const blog = require('./controllers/blog/blog.router');
+const admin = require('./controllers/admin/admin.router');
+const auth = require('./controllers/admin/auth');
+const config = require('./config').dbConfig;
 const cors = require('cors');
 const path = require("path");
 const server = express();
@@ -28,8 +28,9 @@ server.use(session({
     store: new MysqlStore(config)
 }));
 
-require('./passport');
+const passportConfig = require('./config/passport');
 const passport = require('passport');
+passportConfig.init();
 server.use(passport.initialize());
 server.use(passport.session());
 
@@ -46,20 +47,20 @@ const requireLogin = async (req, res, next) => {
     }
 };
 //
-server.use(async (req, res, next) => {
-    req.user = null;
-    if (req.session.passport && req.session.passport.user) {
-        try {
-            // const getUserByUid = require('./model').getUserByUid;
-            // const result = await getUserByUid(req.session.passport.user);
-            // req.user = result[0];
-            req.user = req.session.passport.user;
-        } catch (err) {
-            next(err);
-        }
-    }
-    next();
-});
+// server.use(async (req, res, next) => {
+//     req.user = null;
+//     if (req.session.passport && req.session.passport.user) {
+//         try {
+//             // const getUserByUid = require('./model').getUserByUid;
+//             // const result = await getUserByUid(req.session.passport.user);
+//             // req.user = result[0];
+//             req.user = req.session.passport.user;
+//         } catch (err) {
+//             next(err);
+//         }
+//     }
+//     next();
+// });
 
 server.use('/blog', blog);
 server.use('/api/admin', requireLogin, admin);

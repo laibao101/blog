@@ -17,14 +17,6 @@ router.post('/login', function (req, res, next) {
                 });
             }
 
-            // if (req.user) {
-            //     return res.json({
-            //         code: 1,
-            //         data: {},
-            //         msg: "请不要重复登录"
-            //     });
-            // }
-
             req.logIn(user, function (err) {
                 if (err) {
                     return next(err);

@@ -1,9 +1,10 @@
 const moment = require('moment');
 const Router = require('express').Router;
-const uuidv4 = require('uuid/v4');
-const md5 = require('md5');
+const {md5WithSalt, getUuid} = require("../../util");
 const nodeExcel = require('excel-export');
-const Model = require('./model');
+const Post = require('../../models/post');
+const Category = require('../../models/category');
+const User = require('../../models/user');
 const router = new Router();
 
 /**
@@ -13,8 +14,8 @@ router.get('/posts', async (req, res, next) => {
     try {
         const page = req.query.page - 1 || 0;
         const limit = req.query.limit || 5;
-        const posts = await Model.getPosts(page * limit, Number(limit));
-        const totalRes = await Model.getPostsTotal();
+        const posts = await Post.getPosts(page * limit, Number(limit));
+        const totalRes = await Post.getPostsTotal();
         return res.json({
             code: 0,
             msg: '获取posts成功',
@@ -41,7 +42,7 @@ router.get('/post', async (req, res, next) => {
         });
     }
     try {
-        const post = await Model.getPost(postId);
+        const post = await Post.getPost(postId);
         return res.json({
             code: 0,
             msg: '获取post成功',
@@ -73,7 +74,7 @@ router.post('/editPost', async (req, res, next) => {
     try {
         const mtime = Date.now();
         body.mtime = mtime;
-        const result = await Model.updatePost(body);
+        const result = await Post.updatePost(body);
         if (result.affectedRows > 0) {
             res.json({
                 code: 0,
@@ -145,7 +146,7 @@ router.get('/disableUser', async (req, res, next) => {
  */
 router.get('/users', async (req, res, next) => {
     try {
-        const users = await Model.getUsers();
+        const users = await User.getUsers();
         return res.json({
             code: 0,
             msg: '获取users成功',
@@ -168,12 +169,12 @@ router.post('/user', async (req, res, next) => {
 
     try {
         const userData = {
-            uid: uuidv4(),
+            uid: getUuid(),
             uname: body.username,
             password: md5WithSalt(body.password),
-            nickname: uuidv4()
+            nickname: getUuid()
         };
-        await Model.insertUser(userData);
+        await User.insertUser(userData);
         res.json({
             code: 0,
             msg: '添加用户成功',
@@ -192,14 +193,14 @@ router.get('/categories', async (req, res, next) => {
     try {
         const page = req.query.page - 1 || 0;
         const limit = req.query.limit || 5;
-        const categories = await Model.getCategories(page*limit, limit);
-        const totalRes = await Model.getCategoriesTotal();
+        const categories = await Category.getCategories(page * limit, limit);
+        const totalRes = await Category.getCategoriesTotal();
         return res.json({
             code: 0,
             msg: '获取categories成功',
             data: {
                 categories,
-                total:totalRes[0].total
+                total: totalRes[0].total
             }
         });
     } catch (err) {
@@ -222,7 +223,7 @@ router.post('/post', async (req, res, next) => {
         body.author = author;
         body.ctime = ctime;
         body.status = 1;
-        const result = await Model.insertPost(body);
+        const result = await Post.insertPost(body);
         if (result.insertId) {
             return res.json({
                 code: 0,
@@ -246,7 +247,7 @@ router.post('/post', async (req, res, next) => {
 router.get('/delPost', async (req, res, next) => {
     const postId = req.query.id;
     try {
-        const result = await Model.deletePost(postId);
+        const result = await Post.deletePost(postId);
         if (result.affectedRows > 0) {
             res.json({
                 code: 0,
@@ -324,11 +325,11 @@ router.post('/category', async (req, res, next) => {
         });
     }
     try {
-        const categoryId = uuidv4();
+        const categoryId = getUuid();
         const status = 1;
         body.status = status;
         body.categoryId = categoryId;
-        const result = await Model.insertCategory(body);
+        const result = await Category.insertCategory(body);
         if (result.insertId) {
             return res.json({
                 code: 0,
@@ -348,7 +349,7 @@ router.post('/category', async (req, res, next) => {
 
 router.get('/exportExcel', async (req, res, next) => {
     try {
-        const posts = await Model.getPosts();
+        const posts = await Post.getPosts();
 
         const conf = {};
         conf.cols = [{
@@ -420,11 +421,11 @@ const formatTime = (time) => {
 };
 
 const changeCategoryStatus = (id, status) => {
-    return Model.setCategoryStatus(id, status);
+    return Category.setCategoryStatus(id, status);
 };
 
 const changeUserStatus = (uid, status) => {
-    return Model.setUserStatus(uid, status);
+    return User.setUserStatus(uid, status);
 };
 
 const checkUser = (data) => {
@@ -503,10 +504,6 @@ const checkItem = (field, length, fileName) => {
         code: 0,
         msg: ''
     };
-};
-
-const md5WithSalt = (str) => {
-    return md5(`${str}-blog`);
 };
 
 module.exports = router;
