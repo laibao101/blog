@@ -12,10 +12,10 @@ const setCategoryStatus = (id, status) => {
     return connect.query(setCategoryStatusSql, [status, id]);
 };
 
-const insertCategorySql = `insert into category (categoryId,name,status) values(?,?,?)`;
+const insertCategorySql = `insert into category (categoryId,name) values(?,?,?)`;
 const insertCategory = (data) => {
     const connect = getConnection();
-    return connect.query(insertCategorySql, [data.categoryId, data.name, data.status]);
+    return connect.query(insertCategorySql, [data.categoryId, data.name]);
 };
 
 const getCategoriesTotalSql = `SELECT COUNT(1) as total from category`;

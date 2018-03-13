@@ -2,21 +2,25 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MysqlStore = require('express-mysql-session')(session);
-const blog = require('./controllers/blog/blog.router');
-const admin = require('./controllers/admin/admin.router');
-const auth = require('./controllers/admin/auth');
-const config = require('./config').dbConfig;
+const config = require('./config/dbConfig').mysql;
 const cors = require('cors');
-const path = require("path");
+const path = require('path');
 const server = express();
 
+// 跨域配置
 server.use(cors({
     origin: 'http://localhost:3000',
     credentials: true
 }));
-server.use(express.static(path.join("./build")));
+
+// 静态资源配置(打包后访问页面)
+server.use(express.static(path.join(__dirname,'build')));
+
+// bodyparser配置
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({extended: false}));
+
+// session配置
 server.use(session({
     secret: 'blog',
     proxy: true,
@@ -28,43 +32,20 @@ server.use(session({
     store: new MysqlStore(config)
 }));
 
+// passport配置
 const passportConfig = require('./config/passport');
 const passport = require('passport');
 passportConfig.init();
 server.use(passport.initialize());
 server.use(passport.session());
 
+// 路由
+const glob = require('glob');
 
-const requireLogin = async (req, res, next) => {
-    if (req.user) {
-        await next();
-    } else {
-        await res.status(401).json({
-            code: 1,
-            msg: '请登录',
-            data: {}
-        });
-    }
-};
-//
-// server.use(async (req, res, next) => {
-//     req.user = null;
-//     if (req.session.passport && req.session.passport.user) {
-//         try {
-//             // const getUserByUid = require('./model').getUserByUid;
-//             // const result = await getUserByUid(req.session.passport.user);
-//             // req.user = result[0];
-//             req.user = req.session.passport.user;
-//         } catch (err) {
-//             next(err);
-//         }
-//     }
-//     next();
-// });
-
-server.use('/blog', blog);
-server.use('/api/admin', requireLogin, admin);
-server.use('/api', auth);
+const controllers = glob.sync('./server/controllers/**/*.js');
+controllers.forEach(function(controller) {
+    require(controller.replace("./server", ".")).init(server);
+});
 
 server.listen(5000, (err) => {
     if (err) {

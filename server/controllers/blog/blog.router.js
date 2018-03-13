@@ -80,4 +80,8 @@ router.get('/like', async (req, res, next) => {
     }
 });
 
-module.exports = router;
+module.exports = {
+    init:function (app) {
+        app.use('/blog', router);
+    }
+};

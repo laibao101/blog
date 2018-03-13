@@ -5,6 +5,8 @@ const nodeExcel = require('excel-export');
 const Post = require('../../models/post');
 const Category = require('../../models/category');
 const User = require('../../models/user');
+const {requireLogin} = require("./auth");
+
 const router = new Router();
 
 /**
@@ -326,8 +328,6 @@ router.post('/category', async (req, res, next) => {
     }
     try {
         const categoryId = getUuid();
-        const status = 1;
-        body.status = status;
         body.categoryId = categoryId;
         const result = await Category.insertCategory(body);
         if (result.insertId) {
@@ -506,4 +506,8 @@ const checkItem = (field, length, fileName) => {
     };
 };
 
-module.exports = router;
+module.exports = {
+    init:function (app) {
+        app.use('/api/admin', requireLogin, router);
+    }
+};

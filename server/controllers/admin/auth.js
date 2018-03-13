@@ -2,6 +2,18 @@ const Router = require('express').Router;
 const passport = require('passport');
 const router = new Router();
 
+const requireLogin = async (req, res, next) => {
+    if (req.user) {
+        await next();
+    } else {
+        await res.status(401).json({
+            code: 1,
+            msg: '请登录',
+            data: {}
+        });
+    }
+};
+
 router.post('/login', function (req, res, next) {
     try {
         passport.authenticate('local', function (err, user) {
@@ -46,4 +58,10 @@ router.get('/logout', function (req, res, next) {
     });
 });
 
-module.exports = router;
+module.exports = {
+    router,
+    requireLogin,
+    init: function (app) {
+        app.use('/api', router);
+    }
+};
