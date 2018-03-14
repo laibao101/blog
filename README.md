@@ -2,11 +2,13 @@
 
 写这个demo的意图是为了分享给群里好友做个示例,因为经常看到大家问相同的问题，不到一天写完的，质量比较粗糙，还往大家多多原谅。数据库使用的是Mysql，文件已经导出了.
 
+本demo大量使用es6、es7语法，需要了解的朋友也可以看看
+
 ## 如何启动
 ### 开发调试
 > 推荐使用`yarn`
 
-`npm install` 安装依赖,`npm run start`启动客户端 http://localhost:3000,`npm run server`启动服务端 http://localhost:5000
+`npm install` 安装依赖, `npm run start` 启动客户端 http://localhost:3000, `npm run server` 启动服务端 http://localhost:5000
 
 ### 打包
 `npm run build`(此时得停止服务端的服务), 然后 `npm run server`, 就可以在http://localhost:5000 查看了
@@ -70,6 +72,7 @@
 - [ ] 导出用户信息、导出分类信息
 
 ## 三期计划
+- [ ] 鉴权方式修改为jwt(token)
 - [ ] 增加权限处理,根据角色来设置菜单权限和数据权限(一期没有设置任何权限)
 - [ ] 增加头像以及头像处理功能(前端图片裁切)
 - [ ] 希望能解决Next.js的问题，或者采用其他方式实现SSR
