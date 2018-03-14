@@ -15,7 +15,7 @@ const initState = {
 };
 
 
-export const home = (state = initState, action) => {
+export const homeAction = (state = initState, action) => {
     switch (action.type) {
         case actionTypes.STARTLOADING:
             return {
@@ -76,4 +76,4 @@ export const like = data => async () => {
     return await Http.get('/blog/likes', data);
 };
 
-export default home;
+export default homeAction;

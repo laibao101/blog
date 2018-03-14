@@ -1,7 +1,8 @@
 import React from 'react';
-import {Layout, Form, Input, Icon, Button} from 'antd';
-import {Http, Params} from "../../util";
-import {notification} from "antd/lib/index";
+import {Layout, Form, Input, Icon, Button, notification} from 'antd';
+import {connect} from 'react-redux';
+import {Params} from "../../util";
+import {login} from '../../action/login'
 
 const {Content} = Layout;
 const FormItem = Form.Item;
@@ -18,12 +19,16 @@ class Login extends React.PureComponent {
         if (!data) {
             return;
         }
-        this._submitDataToServer(data);
+        this._submitDataToServer(data)
+            .catch(err => notification.error({
+                message: '请求错误',
+                description: err.reason
+            }));
     }
 
     async _submitDataToServer(data) {
         try {
-            const res = await Http.post('/api/login', data);
+            const res = await this.props.login(data);
             if (res.code === 0) {
                 this.props.history.push('/admin/post');
             }
@@ -54,7 +59,7 @@ class Login extends React.PureComponent {
             <Layout>
                 <Content>
                     <div className="login-layout">
-                        <div className="login-form" style={{maxWidth:300,margin:'20% auto'}}>
+                        <div className="login-form" style={{maxWidth: 300, margin: '20% auto'}}>
                             <Form className="login-form" onSubmit={this._handleSubmit}>
                                 <Form.Item>
                                     <h1 style={{textAlign: 'center'}}>欢迎登录</h1>
@@ -63,21 +68,30 @@ class Login extends React.PureComponent {
                                     {getFieldDecorator('uname', {
                                         rules: [{required: true, message: '请输入用户名'}],
                                     })(
-                                        <Input prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                               placeholder="用户名"/>
+                                        <Input
+                                            prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                            placeholder="用户名"
+                                        />
                                     )}
                                 </FormItem>
                                 <FormItem>
                                     {getFieldDecorator('password', {
                                         rules: [{required: true, message: '请输入密码'}],
                                     })(
-                                        <Input prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                               type="password"
-                                               placeholder="密码"/>
+                                        <Input
+                                            prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                                            type="password"
+                                            placeholder="密码"
+                                        />
                                     )}
                                 </FormItem>
                                 <FormItem>
-                                    <Button type="primary" htmlType="submit" className="login-form-button" style={{width: '100%'}}>登录</Button>
+                                    <Button
+                                        type="primary"
+                                        htmlType="submit"
+                                        className="login-form-button"
+                                        style={{width: '100%'}}
+                                    >登录</Button>
                                     <Button
                                         type="primary"
                                         htmlType="button"
@@ -96,4 +110,7 @@ class Login extends React.PureComponent {
 }
 
 
-export default Form.create()(Login);
+export default connect(
+    state => state.login,
+    {login}
+)(Form.create()(Login));
