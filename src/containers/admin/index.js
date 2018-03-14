@@ -4,7 +4,6 @@ import {connect} from 'react-redux';
 import EditorView from "./EditorView";
 import {getTableList, deletePost} from '../../action/admin';
 import {QueryString, Time} from "../../util";
-import moment from "moment/moment";
 
 class Admin extends React.PureComponent {
     constructor(props) {

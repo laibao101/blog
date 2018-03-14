@@ -1,4 +1,4 @@
-import Http from "../../util/Http";
+import {Http} from "../../util";
 import {notification} from "antd";
 
 const actionTypes = {
