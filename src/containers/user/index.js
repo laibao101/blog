@@ -1,8 +1,9 @@
 import React from "react";
 import {Table, Modal, notification} from "antd";
-import Http from "../../util/Http";
+import {connect} from "react-redux";
+import {disableUser, enableUser, getTableList} from "../../action/user";
 
-export default class User extends React.PureComponent {
+class User extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -46,26 +47,20 @@ export default class User extends React.PureComponent {
         Modal.confirm({
             title: `${record.status === 0 ? '启用' : '禁用'}`,
             content: `确定${record.status === 0 ? '启用' : '禁用'}吗?`,
-            onOk: async () => {
-                const res = await this._changeUserStatus(record.uid, record.status);
-                if(res.code === 0) {
-                    notification.success({
-                        message: '操作结果',
-                        description: res.msg
-                    });
-                    this._updateList();
-                }
+            onOk: () => {
+                this._changeUserStatus(record)
+                    .catch(err => notification.error({
+                        message: '请求错误',
+                        description: err.reason
+                    }));
             },
         });
     }
 
-    async _updateList() {
+    _updateList() {
         try {
-            const res = await this._fetchList();
-                this.setState({
-                    list: res.data
-                });
-        }catch (err){
+            this.props.getTableList();
+        } catch (err) {
             notification.error({
                 message: '请求错误',
                 description: err.reason
@@ -73,45 +68,50 @@ export default class User extends React.PureComponent {
         }
     }
 
-    _fetchList() {
-        return Http.get('/api/admin/users');
-    }
 
-    _changeUserStatus(uid, status) {
+    async _changeUserStatus(record) {
         try {
-            let url = '';
-            if(status === 0) {
-                url = '/api/admin/enableUser';
-            }else{
-                url = '/api/admin/disableUser';
+            let res = null;
+            if (record.status === 0) {
+                res = await this.props.enableUser({uid: record.uid});
+            } else {
+                res = await this.props.disableUser({uid: record.uid});
             }
-
-            return Http.get(url, {uid});
-        }catch (err){
+            notification.success({
+                message: '操作结果',
+                description: res.msg
+            });
+            this._updateList();
+        } catch (err) {
             notification.error({
                 message: '请求错误',
                 description: err.reason
             });
-            return err;
         }
     }
 
     _genOperations(text, record) {
-        return <a onClick={()=> this._changeStatus(record)}>{record.status === 0 ? '启用' : '禁用'}</a>;
+        return <a onClick={() => this._changeStatus(record)}>{record.status === 0 ? '启用' : '禁用'}</a>;
     }
 
     render() {
-        const {list} = this.state;
+        const {list = [], loading = false} = this.props;
         return (
-                <div>
-                    <Table
-                        columns={this.columns}
-                        dataSource={list}
-                        bordered
-                        pagination={false}
-                        rowKey={record => record.id}
-                    />
-                </div>
+            <div>
+                <Table
+                    columns={this.columns}
+                    dataSource={list}
+                    bordered
+                    pagination={false}
+                    loading={loading}
+                    rowKey={record => record.id}
+                />
+            </div>
         )
     }
 }
+
+export default connect(
+    state => state.user,
+    {getTableList, enableUser, disableUser}
+)(User);

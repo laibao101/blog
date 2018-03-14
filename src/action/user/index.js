@@ -3,8 +3,7 @@ import Http from "../../util/Http";
 
 export const actionTypes = {
     LOADING: 'LOADING',
-    HOMELIST: 'HOMELIST',
-    LiKE: 'LiKE',
+    USERLIST: 'USERLIST',
 };
 
 const initState = {
@@ -13,19 +12,17 @@ const initState = {
     loading: false
 };
 
-
-export const homeAction = (state = initState, action) => {
+export const userAction = (state = initState, action) => {
     switch (action.type) {
         case actionTypes.LOADING:
             return {
                 ...state,
                 loading: action.payload.loading
             };
-        case actionTypes.HOMELIST:
+        case actionTypes.USERLIST:
             return {
                 ...state,
                 list: action.payload.list,
-                total: action.payload.total
             };
         default:
             return state;
@@ -35,12 +32,11 @@ export const homeAction = (state = initState, action) => {
 export const getTableList = data => async dispatch => {
     await dispatch(startLoading());
     try {
-        const res = await Http.get(`/blog/posts`, data);
+        const res = await Http.get('/api/admin/users', data);
         await dispatch({
-            type: actionTypes.HOMELIST,
+            type: actionTypes.USERLIST,
             payload: {
-                list: res.data.posts,
-                total: res.data.total
+                list: res.data,
             }
         });
     } catch (err) {
@@ -66,8 +62,12 @@ export const finishLoading = () => ({
     }
 });
 
-export const like = data => async () => {
-    return await Http.get('/blog/likes', data);
+export const enableUser = (data) => () => {
+    return Http.get('/api/admin/enableUser', data);
 };
 
-export default homeAction;
+export const disableUser = (data) => () => {
+    return Http.get('/api/admin/disableUser', data);
+};
+
+export default userAction;
