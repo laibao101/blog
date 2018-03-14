@@ -17,7 +17,11 @@ class Home extends React.PureComponent {
 
     componentWillMount() {
         const page = this._getPage();
-        this._updateList(page);
+        this._updateList(page)
+            .catch(err => notification.error({
+                message: '请求错误',
+                description: err.reason
+            }));
     }
 
     /**
@@ -25,15 +29,15 @@ class Home extends React.PureComponent {
      * @param nextPage 下一页页数
      * @private
      */
-    _paginateChange(nextPage) {
+    async _paginateChange(nextPage) {
         const page = this._getPage();
         // 如果点击的是相同页，不做操作
         if (nextPage === page) {
             return;
         }
         // 翻页后刷新列表
-        this._updateList(nextPage);
-        this.props.history.push({
+        await this._updateList(nextPage);
+        await this.props.history.push({
             pathname: '/',
             search: `?page=${nextPage}`
         });
@@ -66,7 +70,7 @@ class Home extends React.PureComponent {
                     message: '点赞成功',
                     description: res.msg
                 });
-                this._updateList();
+                await this._updateList();
             }
         } catch (err) {
             notification.error({
@@ -81,8 +85,8 @@ class Home extends React.PureComponent {
      * @param page 当前页数
      * @private
      */
-    _updateList(page = 1) {
-        this.props.getTableList({
+    async _updateList(page = 1) {
+        await this.props.getTableList({
             page,
             limit: this.limit
         });
@@ -94,7 +98,7 @@ class Home extends React.PureComponent {
      * @private
      */
     _getPage() {
-        return parseInt(QueryString.getQueryString(this.props.location.search.substring(1)).page) || 1;
+        return parseInt(QueryString.getQueryString(this.props.location.search.substring(1)).page, 10) || 1;
     }
 
     render() {

@@ -16,7 +16,6 @@ const initState = {
 
 
 export const home = (state = initState, action) => {
-    console.log(action)
     switch (action.type) {
         case actionTypes.STARTLOADING:
             return {
@@ -73,15 +72,8 @@ export const finishLoading = () => ({
     }
 });
 
-export const like = data => async dispatch => {
-    try {
-        return await Http.get('/blog/like', data);
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
+export const like = data => async () => {
+    return await Http.get('/blog/likes', data);
 };
 
 export default home;
