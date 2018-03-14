@@ -1,8 +1,8 @@
 import React from "react";
 import {Form, Input, Modal, Select, notification} from "antd";
 import {connect} from 'react-redux';
-import {getCategories, getPostData} from '../../action/admin'
-import {Params, Http} from "../../util";
+import {getCategories, getPostData, addPost, editPost} from '../../action/admin'
+import {Params} from "../../util";
 
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -36,7 +36,7 @@ class EditorView extends React.PureComponent {
             }));
         const {mode, id} = this.props;
         if (mode === 'edit') {
-            this.props.getPostData({id})
+            this._setForm(id)
                 .catch(err => notification.error({
                     message: '请求错误',
                     description: err.reason
@@ -45,10 +45,14 @@ class EditorView extends React.PureComponent {
     }
 
     async _setForm(id) {
-        const data = await this.props.getPostData({id});
-
-        if (data.code === 0) {
+        try {
+            const data = await this.props.getPostData({id});
             this._setFormData(data.data.post);
+        } catch (err) {
+            notification.error({
+                message: '请求错误',
+                description: err.reason
+            });
         }
     }
 
@@ -61,59 +65,61 @@ class EditorView extends React.PureComponent {
         });
     }
 
-    async _getPostData(id) {
-        try {
-            return await Http.get('/api/admin/post', {id});
-        }
-        catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-            return err;
-        }
-    }
-
     _genOptions(arr) {
         return arr.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
     }
 
     async _onOk() {
         const data = this._getFormData();
-
+        const {mode, id} = this.props;
         if (data) {
-            try {
-                const res = await this._submitFormData(data);
-                if (res.code === 0) {
-                    this.props.onOk(true);
-                    notification.success({
-                        message: '提交成功',
-                        description: res.msg
-                    });
-                } else {
-                    notification.error({
-                        message: '提交失败',
-                        description: res.msg
-                    });
-                }
-            }catch (err) {
-                notification.error({
-                    message: '请求错误',
-                    description: err.reason
-                });
+            if (mode === 'add') {
+                this._addPost(data)
+                    .catch(err => notification.error({
+                        message: '请求错误',
+                        description: err.reason
+                    }));
+            } else {
+                data.id = id;
+                this._editPost(data)
+                    .catch(err => notification.error({
+                        message: '请求错误',
+                        description: err.reason
+                    }));
             }
         }
     }
 
-    _submitFormData(data) {
-        let url = '';
-        if (this.props.mode === 'add') {
-            url = '/api/admin/post';
-        } else {
-            data.id = this.props.id;
-            url = '/api/admin/editPost';
+    async _editPost(data) {
+        try {
+            const res = await this.props.editPost(data);
+            this.props.onOk(true);
+            notification.success({
+                message: '提交成功',
+                description: res.msg
+            });
+        } catch (err) {
+            notification.error({
+                message: '请求错误',
+                description: err.reason
+            });
         }
-        return Http.post(url, data);
+    }
+
+    async _addPost(data) {
+        try {
+            const res = await this.props.addPost(data);
+            this.props.onOk(true);
+            notification.success({
+                message: '提交成功',
+                description: res.msg
+            });
+        } catch (err) {
+            notification.error({
+                message: '请求错误',
+                description: err.reason
+            });
+        }
     }
 
     _getFormData() {
@@ -136,10 +142,9 @@ class EditorView extends React.PureComponent {
     }
 
     render() {
-        const {mode, form, options = [], post = {}} = this.props;
+        const {mode, form, options = []} = this.props;
         const {getFieldDecorator} = form;
         const categories = this._genOptions(options);
-        this._setFormData(post);
         return (
             <Modal
                 title={mode === 'add' ? '新增post' : '编辑post'}
@@ -210,6 +215,6 @@ class EditorView extends React.PureComponent {
 }
 
 export default connect(
-    state => state.admin.editorAction,
-    {getCategories, getPostData}
+    state => state.admin.editor,
+    {getCategories, getPostData, addPost, editPost}
 )(Form.create()(EditorView));

@@ -3,7 +3,8 @@ import {Button, Table, notification, Divider, Modal} from "antd";
 import {connect} from 'react-redux';
 import EditorView from "./EditorView";
 import {getTableList, deletePost} from '../../action/admin';
-import {Time} from "../../util";
+import {QueryString, Time} from "../../util";
+import moment from "moment/moment";
 
 class Admin extends React.PureComponent {
     constructor(props) {
@@ -151,20 +152,20 @@ class Admin extends React.PureComponent {
     }
 
     _preview(id) {
-        this.props.history.push(`/detail/${id}`);
+        window.open(`#/detail/${id}`)
     }
 
-    _updateList() {
-        this._getList()
+    _updateList(nextPage = this._getPage()) {
+        this._getList(nextPage)
             .catch(err => notification.error({
                 message: '请求错误',
                 description: err.reason
             }));
     }
 
-    async _getList() {
+    async _getList(nextPage) {
         try {
-            await this.props.getTableList({page: this.state.current, limit: this.limit});
+            await this.props.getTableList({page: nextPage, limit: this.limit});
         } catch (err) {
             notification.error({
                 message: '请求错误',
@@ -183,21 +184,31 @@ class Admin extends React.PureComponent {
         });
     }
 
-    _paginateChange(current) {
-        this.setState({
-            current,
-        }, () => {
-            this._updateList();
+    async _paginateChange(nextPage) {
+        const page = this._getPage();
+        // 如果点击的是相同页，不做操作
+        if (nextPage === page) {
+            return;
+        }
+        // 翻页后刷新列表
+        await this._updateList(nextPage);
+        await this.props.history.push({
+            pathname: '/admin/post',
+            search: `?page=${nextPage}`
         });
     }
 
+    _getPage() {
+        return parseInt(QueryString.getQueryString(this.props.location.search.substring(1)).page, 10) || 1;
+    }
+
     render() {
-        console.log(this.props)
-        const {list = [], total = 0} = this.props;
+        const {list = [], total = 0, loading = false} = this.props;
+        const page = this._getPage();
         const pagination = {
             pageSize: 5,
             showQuickJumper: true,
-            current: this.state.current,
+            current: page,
             total: total,
             onChange: this._paginateChange
         };
@@ -226,6 +237,7 @@ class Admin extends React.PureComponent {
                     columns={this.columns}
                     dataSource={list}
                     bordered
+                    loading={loading}
                     pagination={pagination}
                     rowKey={record => record.id}
                 />
@@ -235,6 +247,6 @@ class Admin extends React.PureComponent {
 }
 
 export default connect(
-    state => state.admin.adminAction,
+    state => state.admin.admin,
     {getTableList, deletePost}
 )(Admin)

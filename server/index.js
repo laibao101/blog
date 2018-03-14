@@ -28,7 +28,7 @@ server.use(session({
     saveUninitialized: true,
     rolling: true,
     unset: 'destroy',
-    cookie: {secure: false, httpOnly: true, maxAge: 1000 * 30},
+    cookie: {secure: false, httpOnly: true, maxAge: 1000 * 60 * 10 },
     store: new MysqlStore(config)
 }));
 

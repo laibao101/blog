@@ -12,6 +12,7 @@ const initState = {
 };
 
 export const adminAction = (state = initState, action) => {
+    console.log(action, state)
     switch (action.type) {
         case actionTypes.LOADING :
             return {
@@ -21,7 +22,7 @@ export const adminAction = (state = initState, action) => {
         case actionTypes.POSTLIST:
             return {
                 ...state,
-                loading: action.payload.list,
+                list: action.payload.list,
                 total: action.payload.total
             };
         default:
@@ -50,7 +51,7 @@ export const getTableList = (data) => async dispatch => {
         dispatch({
             type:actionTypes.POSTLIST,
             payload: {
-                list: res.data.list,
+                list: res.data.posts,
                 total: res.data.total
             }
         });

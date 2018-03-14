@@ -33,7 +33,9 @@ export const getCategories = () => async dispatch => {
         const res = await Http.get('/api/admin/categories');
         dispatch({
             type: actionTypes.OPTIONS,
-            payload: res.data.list
+            payload: {
+                options: res.data.categories
+            }
         });
     } catch (err) {
         notification.error({
@@ -43,19 +45,23 @@ export const getCategories = () => async dispatch => {
     }
 };
 
-export const getPostData = (data) => async dispatch => {
+export const getPostData = (data) => async () => {
     try {
-        const res = await Http.get('/api/admin/post', data);
-        dispatch({
-            type: actionTypes.POSTDATA,
-            payload: res.data.post
-        });
+        return await Http.get('/api/admin/post', data);
     } catch (err) {
         notification.error({
             message: '请求错误',
             description: err.reason
         });
     }
+};
+
+export const addPost = (data) => () => {
+    return Http.post('/api/admin/post', data);
+};
+
+export const editPost = (data) => () => {
+    return Http.post('/api/admin/editPost', data);
 };
 
 export default editorAction;
