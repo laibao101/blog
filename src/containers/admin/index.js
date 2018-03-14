@@ -1,10 +1,11 @@
 import React from "react";
 import {Button, Table, notification, Divider, Modal} from "antd";
-import moment from "moment";
+import {connect} from 'react-redux';
 import EditorView from "./EditorView";
-import Http from "../../util/Http";
+import {getTableList, deletePost} from '../../action/admin';
+import {Time} from "../../util";
 
-export default class Admin extends React.PureComponent {
+class Admin extends React.PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -66,7 +67,7 @@ export default class Admin extends React.PureComponent {
         if (time === '0') {
             return '';
         }
-        return <span>{moment(Number(time)).format('YYYY-MM-DD HH:mm:ss')}</span>;
+        return <span>{Time.formatTime(time)}</span>;
     }
 
     _genOperations(text, record) {
@@ -137,7 +138,7 @@ export default class Admin extends React.PureComponent {
             content: '确定删除吗?',
             onOk: async () => {
                 try {
-                    const res = await this._deletePost(id);
+                    const res = await this.props.deletePost({id});
                     if (res.code === 0) {
                         await this._updateList();
                     }
@@ -155,51 +156,33 @@ export default class Admin extends React.PureComponent {
         this.props.history.push(`/detail/${id}`);
     }
 
-    _deletePost(id) {
+    _updateList() {
+        this._getList()
+            .catch(err => notification.error({
+                message: '请求错误',
+                description: err.reason
+            }));
+    }
+
+    async _getList() {
         try {
-            return Http.get('/api/admin/delPost', {id});
+            await this.props.getTableList({page: this.state.current, limit: this.limit});
         } catch (err) {
             notification.error({
                 message: '请求错误',
                 description: err.reason
             });
-            return err;
         }
     }
 
-    async _updateList() {
-        let data = [];
-        try {
-            const res = await Http.get('/api/admin/posts', {page: this.state.current, limit: this.limit});
-            if (res.code === 0) {
-                data = res.data;
-                this.setState({
-                    list: data.posts,
-                    total: data.total
-                });
+    _changeEditorStatus(status, sign) {
+        this.setState({
+            showEditor: status
+        }, () => {
+            if (sign) {
+                this._updateList();
             }
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
-        return data;
-    }
-
-    _addNewPost() {
-        this.setState({
-            showEditor: 'add'
         });
-    }
-
-    _editorOk(success) {
-        this.setState({
-            showEditor: ''
-        });
-        if (success) {
-            this._updateList();
-        }
     }
 
     _paginateChange(current) {
@@ -211,12 +194,12 @@ export default class Admin extends React.PureComponent {
     }
 
     render() {
-        const {list} = this.state;
+        const {list = [], total = 0} = this.props;
         const pagination = {
             pageSize: 5,
             showQuickJumper: true,
             current: this.state.current,
-            total: this.state.total,
+            total: total,
             onChange: this._paginateChange
         };
         return (
@@ -226,14 +209,18 @@ export default class Admin extends React.PureComponent {
                         <EditorView
                             mode={this.state.showEditor}
                             id={this.state.id}
-                            onOk={this._editorOk}
+                            onOk={(sign) => {
+                                this._changeEditorStatus('', sign);
+                            }}
                         /> : null
                 }
                 <div style={{marginBottom: '10px'}}>
                     <Button
                         type="primary"
                         icon="plus-circle-o"
-                        onClick={this._addNewPost}
+                        onClick={() => {
+                            this._changeEditorStatus('add');
+                        }}
                     >新增</Button>
                 </div>
                 <Table
@@ -247,3 +234,8 @@ export default class Admin extends React.PureComponent {
         )
     }
 }
+
+export default connect(
+    state => state.admin,
+    {getTableList, deletePost}
+)(Admin)
