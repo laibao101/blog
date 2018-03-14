@@ -1,7 +1,8 @@
 import React from "react";
 import {Form, Input, Modal, Select, notification} from "antd";
-import Http from "../../util/Http";
-import Params from "../../util/Params";
+import {connect} from 'react-redux';
+import {getCategories, getPostData} from '../../action/admin'
+import {Params, Http} from "../../util";
 
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -28,14 +29,14 @@ class EditorView extends React.PureComponent {
     }
 
     componentWillMount() {
-        this._getCategories()
+        this.props.getCategories()
             .catch(err => notification.error({
                 message: '请求错误',
                 description: err.reason
             }));
         const {mode, id} = this.props;
         if (mode === 'edit') {
-            this._setForm(id)
+            this.props.getPostData({id})
                 .catch(err => notification.error({
                     message: '请求错误',
                     description: err.reason
@@ -44,7 +45,7 @@ class EditorView extends React.PureComponent {
     }
 
     async _setForm(id) {
-        const data = await this._getPostData(id);
+        const data = await this.props.getPostData({id});
 
         if (data.code === 0) {
             this._setFormData(data.data.post);
@@ -70,22 +71,6 @@ class EditorView extends React.PureComponent {
                 description: err.reason
             });
             return err;
-        }
-    }
-
-    async _getCategories() {
-        try {
-            const res = await Http.get('/api/admin/categories');
-            const data = res.data;
-            const options = this._genOptions(data);
-            this.setState({
-                options
-            });
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
         }
     }
 
@@ -151,8 +136,10 @@ class EditorView extends React.PureComponent {
     }
 
     render() {
-        const {mode, form} = this.props;
+        const {mode, form, options = [], post = {}} = this.props;
         const {getFieldDecorator} = form;
+        const categories = this._genOptions(options);
+        this._setFormData(post);
         return (
             <Modal
                 title={mode === 'add' ? '新增post' : '编辑post'}
@@ -212,7 +199,7 @@ class EditorView extends React.PureComponent {
                             <Select
                                 placeholder="请选择分类"
                             >
-                                {this.state.options}
+                                {categories}
                             </Select>
                         )}
                     </FormItem>
@@ -222,4 +209,7 @@ class EditorView extends React.PureComponent {
     }
 }
 
-export default Form.create()(EditorView);
+export default connect(
+    state => state.admin.editorAction,
+    {getCategories, getPostData}
+)(Form.create()(EditorView));

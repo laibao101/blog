@@ -54,8 +54,6 @@ class Admin extends React.PureComponent {
                 }
             }
         ];
-        this._addNewPost = this._addNewPost.bind(this);
-        this._editorOk = this._editorOk.bind(this);
         this._paginateChange = this._paginateChange.bind(this);
     }
 
@@ -194,6 +192,7 @@ class Admin extends React.PureComponent {
     }
 
     render() {
+        console.log(this.props)
         const {list = [], total = 0} = this.props;
         const pagination = {
             pageSize: 5,
@@ -236,6 +235,6 @@ class Admin extends React.PureComponent {
 }
 
 export default connect(
-    state => state.admin,
+    state => state.admin.adminAction,
     {getTableList, deletePost}
 )(Admin)
