@@ -1,6 +1,6 @@
 import React from 'react';
 import {withRouter} from 'react-router-dom';
-import RouterConfig from "../routerConfig";
+import RouterConfig from "../config/routerConfig";
 import AdminLayout from "../components/Layout/AdminLayout";
 import BlogLayout from "../components/Layout/BlogLayout";
 

@@ -22,7 +22,7 @@
 }
 
 .blog-logo{
-    background: url("./logo.png");
+    background: url("../img/logo.png");
     width: 64px;
     height: 64px;
     display: inline-block;

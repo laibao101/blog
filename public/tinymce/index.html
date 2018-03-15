@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--<link rel="stylesheet" href="./tinymac.css" />-->
+    <script src="./js/tinymce/tinymce.min.js"></script>
+    <script>
+        tinymce.init({
+            selector: 'div#tinymceContent',
+            height: 500,
+            menubar: false,
+            theme: 'modern',
+            toolbar: 'undo redo | fontselect | fontsizeselect | bold italic underline italic | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            statusbar: false,
+            plugins: 'paste',
+            paste_data_images: true,
+            language: 'zh_CN',
+            font_formats: 'Arial=arial,helvetica,sans-serif;' +
+                'Arial Black=arial black,avant garde;' +
+                'Times New Roman=times new roman,times;' +
+                'Courier New=courier new,courier;' +
+                'Tahoma=tahoma,arial,helvetica,sans-serif;' +
+                'Verdana=verdana,geneva;' +
+                '宋体=SimSun;' +
+                '新宋体=NSimSun;' +
+                '黑体=SimHei;' +
+                '微软雅黑=Microsoft YaHei',
+            fontsize_formats: '12pt 14pt 18pt 24pt 36pt',
+            extended_valid_elements: 'span',
+            setup : function(ed) {
+                ed.on('init', function(ed) {
+                    ed.target.editorCommands.execCommand("fontName", false, "宋体");
+                    ed.target.editorCommands.execCommand("fontSize", false, "14pt");
+                    // ed.execCommand("fontSize", false, "2");
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div id='tinymceContent'>
+    </div>
+</body>
+
+</html>

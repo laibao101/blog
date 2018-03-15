@@ -1,15 +1,15 @@
 import React from "react";
 import {Route} from 'react-router-dom';
-import Home from './containers/home';
-import Detail from './containers/detail';
-import About from "./containers/about";
-import Contact from "./containers/contact";
-import Login from './containers/login';
-import Admin from "./containers/admin";
-import User from "./containers/user";
-import Category from "./containers/category";
-import ExportExcel from "./containers/exportExcel";
-import Register from "./containers/register";
+import Home from '../containers/home/index';
+import Detail from '../containers/detail/index';
+import About from "../containers/about/index";
+import Contact from "../containers/contact/index";
+import Login from '../containers/login/index';
+import Admin from "../containers/admin/index";
+import User from "../containers/user/index";
+import Category from "../containers/category/index";
+import ExportExcel from "../containers/exportExcel/index";
+import Register from "../containers/register/index";
 
 export default () => [
     <Route path="/" component={Home} key="/" exact />,

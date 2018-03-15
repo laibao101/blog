@@ -21,9 +21,6 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });
-var xss = require("xss");
-var html = xss('<script>alert("xss");</script>');
-console.log(html);
 
 router.post('/img',upload.single('img'), async (req, res, next) => {
     try {
