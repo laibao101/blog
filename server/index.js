@@ -14,7 +14,10 @@ server.use(cors({
 }));
 
 // 静态资源配置(打包后访问页面)
-server.use(express.static(path.join(__dirname,'build')));
+server.use(express.static(path.join(__dirname, 'build')));
+
+// 服务端静态资源
+server.use('/static', express.static(path.join(__dirname, 'uploads')));
 
 // bodyparser配置
 server.use(bodyParser.json());
@@ -28,7 +31,7 @@ server.use(session({
     saveUninitialized: true,
     rolling: true,
     unset: 'destroy',
-    cookie: {secure: false, httpOnly: true, maxAge: 1000 * 60 * 10 },
+    cookie: {secure: false, httpOnly: true, maxAge: 1000 * 60 * 10},
     store: new MysqlStore(config)
 }));
 
@@ -43,7 +46,7 @@ server.use(passport.session());
 const glob = require('glob');
 
 const controllers = glob.sync('./server/controllers/**/*.js');
-controllers.forEach(function(controller) {
+controllers.forEach(function (controller) {
     require(controller.replace("./server", ".")).init(server);
 });
 

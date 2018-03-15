@@ -27,6 +27,12 @@ export default class AdminLayout extends React.PureComponent {
         return arr.map(item => <Breadcrumb.Item key={item}>{item}</Breadcrumb.Item>)
     };
 
+    _handleLogout = ({key}) => {
+        if(key === 'logout') {
+            this.props.logout();
+        }
+    };
+
     render() {
         return (
             <div>
@@ -73,6 +79,12 @@ export default class AdminLayout extends React.PureComponent {
                                 type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                                 onClick={this.toggle}
                             />
+                            <Menu
+                                selectedKeys={[]}
+                                onClick={this._handleLogout}
+                            >
+                                <Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>
+                            </Menu>
                         </Header>
                         <Content style={{margin: '0 16px'}}>
                             <Breadcrumb style={{margin: '16px 0'}}>

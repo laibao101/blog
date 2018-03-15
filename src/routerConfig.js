@@ -9,6 +9,7 @@ import Admin from "./containers/admin";
 import User from "./containers/user";
 import Category from "./containers/category";
 import ExportExcel from "./containers/exportExcel";
+import Register from "./containers/register";
 
 export default () => [
     <Route path="/" component={Home} key="/" exact />,
@@ -16,6 +17,7 @@ export default () => [
     <Route path="/about" component={About}  key="/about"/>,
     <Route path="/contact" component={Contact}  key="/contact"/>,
     <Route path="/login" component={Login}  key="/login"/>,
+    <Route path="/register" component={Register}  key="/register"/>,
     <Route path="/admin/post" component={Admin}  key="/admin/post"/>,
     <Route path="/admin/user" component={User}  key="/admin/user"/>,
     <Route path="/admin/category" component={Category}  key="/admin/category"/>,

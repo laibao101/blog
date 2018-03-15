@@ -5,17 +5,8 @@ const nodeExcel = require('excel-export');
 const Post = require('../../models/post');
 const Category = require('../../models/category');
 const User = require('../../models/user');
-const {requireLogin} = require("./auth");
-const {upload} = require("../../basic/upload");
+const {requireLogin} = require("../basic/auth");
 const router = new Router();
-
-router.post('/avatar', upload.any(), async (req, res ,next) => {
-   console.log(req.file);
-   console.log(req.files);
-   res.json({
-       code:1
-   })
-});
 
 /**
  * 获取所有posts
