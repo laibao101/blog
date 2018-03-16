@@ -60,9 +60,9 @@ class Register extends React.PureComponent {
             obj = Params.serializeSearchData(values);
         });
 
-        if(obj && this._checkData(obj)) {
+        if (obj && this._checkData(obj)) {
             return obj;
-        }else if(obj && !this._checkData(obj)){
+        } else if (obj && !this._checkData(obj)) {
             message.error('两次填入的密码不一样');
         }
 
@@ -72,7 +72,7 @@ class Register extends React.PureComponent {
     _checkData(obj) {
         try {
             return obj.password === obj.passwordConfirm;
-        }catch (err) {
+        } catch (err) {
             return false;
         }
     }
@@ -140,20 +140,23 @@ class Register extends React.PureComponent {
     }
 
     _handleChange(info) {
-        // let fielList = info.fileList;
-        // fileList = fileList.slice(-2);
-        // this.setState({ fileList });
-        // if (info.file.status !== 'uploading') {
-        //     console.log(info.file, info.fileList);
-        // }
-        // if (info.file.status === 'done') {
-        //     message.success(`${info.file.name} file uploaded successfully`);
-        // } else if (info.file.status === 'error') {
-        //     message.error(`${info.file.name} file upload failed.`);
-        // }
+        let fileList = info.fileList;
+        fileList = fileList.slice(-1);
+        if (info.file.status !== 'uploading') {
+            console.log(info.file, info.fileList);
+        }
+        this.setState({
+            fileList,
+        });
+        if (info.file.status === 'done') {
+            message.success(`${info.file.name} file uploaded successfully`);
+
+        } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} file upload failed.`);
+        }
     }
 
-    _handleCancel = () => this.setState({ previewVisible: false });
+    _handleCancel = () => this.setState({previewVisible: false});
 
     _handlePreview(file) {
         this.setState({
@@ -165,36 +168,20 @@ class Register extends React.PureComponent {
     render() {
         const step = this._getCurrentStep();
         const props = {
-            name:"img",
-            action:"/api/uploadImg",
-            listType:"picture",
-            onChange:(info) => {
-                console.log(info);
-                let fileList = info.fileList;
-                fileList = fileList.slice(-1);
-                if (info.file.status !== 'uploading') {
-                    console.log(info.file, info.fileList);
-                }
-                this.setState({
-                    fileList,
-                });
-                if (info.file.status === 'done') {
-                    message.success(`${info.file.name} file uploaded successfully`);
-
-                } else if (info.file.status === 'error') {
-                    message.error(`${info.file.name} file upload failed.`);
-                }
-            },
-            onPreview:this._handlePreview,
+            name: "img",
+            action: "/api/uploadImg",
+            listType: "picture-card",
+            onChange: this._handleChange,
+            onPreview: this._handlePreview,
         };
         return (
             <Content>
                 <Card bordered={false}>
                     <div>
                         <Steps current={step}>
-                            <Step title="填写基本信息" />
-                            <Step title="上传头像" />
-                            <Step title="完成" />
+                            <Step title="填写基本信息"/>
+                            <Step title="上传头像"/>
+                            <Step title="完成"/>
                         </Steps>
                     </div>
                     <Form className="login-form" onSubmit={this._handleSubmit}>
@@ -202,21 +189,50 @@ class Register extends React.PureComponent {
                             step === 0 ?
                                 this._getFirstLayout()
                                 :
+                                null
+                        }
+                        {
+                            step === 1 ?
                                 (
-                                    <FormItem>
+                                    <FormItem label="用户头像">
                                         <Upload
                                             {...props}
                                             fileList={this.state.fileList}
+                                            style={{
+                                                width: '100%'
+                                            }}
                                         >
-                                            <Button>
-                                                <Icon type="upload" /> upload
-                                            </Button>
+                                            <div>
+                                                <Icon type="plus"/>
+                                                <div className="ant-upload-text">Upload</div>
+                                            </div>
                                         </Upload>
-                                        <Modal visible={this.state.previewVisible} footer={null} onCancel={this._handleCancel}>
-                                            <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                        <Modal visible={this.state.previewVisible} footer={null}
+                                               onCancel={this._handleCancel}>
+                                            <img alt="example" style={{width: '100%'}} src={this.state.previewImage}/>
                                         </Modal>
+                                        <Button
+                                            disable={this.state.fileList.length < 1}
+                                            onClick={() => {
+                                                this.setState({
+                                                    step: 2,
+                                                });
+                                            }}
+                                        >确定并进行下一步</Button>
                                     </FormItem>
-                                )
+                                ) : null
+                        }
+                        {
+                            step === 2 ?
+                                (
+                                    <div>
+                                        <Button
+                                            onClick={() => {
+                                                this.props.history.push('/login');
+                                            }}
+                                        >前去登录</Button>
+                                    </div>
+                                ) : null
                         }
                     </Form>
                 </Card>
