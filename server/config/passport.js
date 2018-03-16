@@ -15,7 +15,7 @@ module.exports.init = function () {
     });
 
     passport.use(new LocalStrategy({
-        usernameField: 'uname',
+        usernameField: 'username',
         passwordField: 'password'
     }, async (name, password, done) => {
         console.log('passport LocalStrategy=>', name, password);

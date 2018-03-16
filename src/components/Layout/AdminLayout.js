@@ -1,11 +1,13 @@
 import React from "react";
-import {Layout, Menu, Icon, LocaleProvider, Breadcrumb} from 'antd';
+import {Layout, Menu, Icon, LocaleProvider, Breadcrumb, Dropdown, Badge, Avatar} from 'antd';
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import GlobalFooter from "../GlobalFooter";
+import {connect} from "react-redux";
+import {logout} from "../../action/app";
 
 const {Header, Sider, Content} = Layout;
 
-export default class AdminLayout extends React.PureComponent {
+class AdminLayout extends React.PureComponent {
     state = {
         collapsed: false,
     };
@@ -28,12 +30,35 @@ export default class AdminLayout extends React.PureComponent {
     };
 
     _handleLogout = ({key}) => {
-        if(key === 'logout') {
+        if (key === 'logout') {
             this.props.logout();
         }
     };
 
+    componentWillMount() {
+        this._checkLogin();
+    }
+
+    componentWillReceiveProps() {
+        this._checkLogin();
+    }
+
+    _checkLogin() {
+        const pathname = this.props.location.pathname;
+        if (!this.props.isLogin) {
+            this.props.history.push(`/login?backUrl=${pathname}`);
+        }
+    }
+
     render() {
+        const menu = (
+            <Menu
+                selectedKeys={[]}
+                onClick={this._handleLogout}
+            >
+                <Menu.Item key="logout"><Icon type="logout"/>退出登录</Menu.Item>
+            </Menu>
+        );
         return (
             <div>
                 <Layout style={{minHeight: '100vh'}}>
@@ -79,12 +104,26 @@ export default class AdminLayout extends React.PureComponent {
                                 type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                                 onClick={this.toggle}
                             />
-                            <Menu
-                                selectedKeys={[]}
-                                onClick={this._handleLogout}
+                            <div
+                                style={{
+                                    display: 'inline-block',
+                                    float: 'right',
+                                }}
                             >
-                                <Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>
-                            </Menu>
+                                <span style={{marginRight: 24}}>
+                                    <Dropdown overlay={menu} placement="bottomLeft">
+                                      <Badge dot>
+                                          <Avatar
+                                              shape="square"
+                                              icon="user"
+                                              size="large"
+                                          >
+                                              {this.props.userInfo.nickname}
+                                          </Avatar>
+                                      </Badge>
+                                    </Dropdown>
+                                </span>
+                            </div>
                         </Header>
                         <Content style={{margin: '0 16px'}}>
                             <Breadcrumb style={{margin: '16px 0'}}>
@@ -103,3 +142,8 @@ export default class AdminLayout extends React.PureComponent {
         );
     }
 }
+
+export default connect(
+    state => state.app,
+    {logout}
+)(AdminLayout);

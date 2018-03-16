@@ -37,7 +37,11 @@ router.post('/login', function (req, res, next) {
                 }
                 return res.json({
                     code: 0,
-                    data: {},
+                    data: {
+                        uid: user.uid,
+                        name: user.uname,
+                        nickname: user.nickname,
+                    },
                     msg: "登录成功",
                 });
             });
