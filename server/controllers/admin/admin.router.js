@@ -162,29 +162,7 @@ router.get('/users', async (req, res, next) => {
  * 添加user
  */
 router.post('/user', async (req, res, next) => {
-    const body = req.body;
-    const checkResult = checkUser(body);
-    if (!checkResult.isValid) {
-        return res.json(checkResult);
-    }
 
-    try {
-        const userData = {
-            uid: getUuid(),
-            uname: body.username,
-            password: md5WithSalt(body.password),
-            nickname: getUuid()
-        };
-        await User.insertUser(userData);
-        res.json({
-            code: 0,
-            msg: '添加用户成功',
-            data: {}
-        });
-    }
-    catch (err) {
-        next(err);
-    }
 });
 
 /**
@@ -426,27 +404,6 @@ const changeUserStatus = (uid, status) => {
     return User.setUserStatus(uid, status);
 };
 
-const checkUser = (data) => {
-    if (!data.username) {
-        return {
-            isValid: false,
-            code: 1,
-            msg: '请输入用户名'
-        };
-    } else if (!data.password) {
-        return {
-            isValid: false,
-            code: 1,
-            msg: '请输入密码'
-        };
-    }
-
-    return {
-        isValid: true,
-        code: 0,
-        msg: ''
-    }
-};
 
 const checkPost = (data) => {
     const title = data.title;

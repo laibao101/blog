@@ -31,10 +31,17 @@ const getUserByUid = (uid) => {
     return connect.query(getUserByUidSql, [uid]);
 };
 
+const getUserByNameSql = `select count(1) as total from user where user.uname = ?`;
+const getUserByName = (uname) => {
+    const connect = getConnection();
+    return connect.query(getUserByNameSql, [uname]);
+};
+
 module.exports = {
     insertUser,
     getUsers,
     setUserStatus,
     getUser,
+    getUserByName,
     getUserByUid
 };

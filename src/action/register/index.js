@@ -1,5 +1,5 @@
 import Http from "../../util/Http";
 
-export const register = () => {
-    return Http.post('/api/register');
+export const register = (data) => () => {
+    return Http.post('/api/register', data);
 };

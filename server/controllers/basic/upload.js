@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post('/img',upload.single('img'), async (req, res, next) => {
+router.post('/uploadImg',upload.single('img'), async (req, res, next) => {
     try {
         const imgUrl = path.join('\\static', req.file.filename);
         res.json({
@@ -42,7 +42,7 @@ router.post('/img',upload.single('img'), async (req, res, next) => {
 module.exports = {
     upload,
     init: function (app) {
-        app.use('/api',requireLogin, router)
+        app.use('/api', router)
     }
 };
 

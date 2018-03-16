@@ -1,15 +1,20 @@
 import React from 'react';
-import {Layout, Form, Input, Icon, Button, notification} from 'antd';
+import {Layout, Form, Input, Icon, Button, notification, Steps, Card, message, Upload} from 'antd';
 import {connect} from 'react-redux';
 import {Params} from "../../util";
 import {register} from '../../action/register'
 
 const {Content} = Layout;
 const FormItem = Form.Item;
+const Step = Steps.Step;
 
 class Register extends React.PureComponent {
     constructor() {
         super();
+        this.state = {
+            fileList: [],
+            step: 0,
+        };
         this._handleSubmit = this._handleSubmit.bind(this);
     }
 
@@ -28,9 +33,11 @@ class Register extends React.PureComponent {
 
     async _submitDataToServer(data) {
         try {
-            const res = await this.props.login(data);
+            const res = await this.props.register(data);
             if (res.code === 0) {
-                this.props.history.push('/admin/post');
+                this.setState({
+                    step: 1
+                });
             }
         } catch (err) {
             notification.error({
@@ -49,63 +56,129 @@ class Register extends React.PureComponent {
             obj = Params.serializeSearchData(values);
         });
 
-        return obj;
+        if(obj && this._checkData(obj)) {
+            return obj;
+        }else if(obj && !this._checkData(obj)){
+            message.error('两次填入的密码不一样');
+        }
+
+        return false;
     }
 
+    _checkData(obj) {
+        try {
+            return obj.password === obj.passwordConfirm;
+        }catch (err) {
+            return false;
+        }
+    }
 
-    render() {
+    _getCurrentStep() {
+        return this.state.step;
+    }
+
+    _getFirstLayout() {
         const {getFieldDecorator} = this.props.form;
         return (
-            <Layout>
-                <Content>
-                    <div className="login-layout">
-                        <div className="login-form" style={{maxWidth: 300, margin: '20% auto'}}>
-                            <Form className="login-form" onSubmit={this._handleSubmit}>
-                                <Form.Item>
-                                    <h1 style={{textAlign: 'center'}}>欢迎注册</h1>
-                                </Form.Item>
-                                <FormItem>
-                                    {getFieldDecorator('uname', {
-                                        rules: [{required: true, message: '请输入用户名'}],
-                                    })(
-                                        <Input
-                                            prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                            placeholder="用户名"
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem>
-                                    {getFieldDecorator('password', {
-                                        rules: [{required: true, message: '请输入密码'}],
-                                    })(
-                                        <Input
-                                            prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                                            type="password"
-                                            placeholder="密码"
-                                        />
-                                    )}
-                                </FormItem>
-                                <FormItem>
-                                    <Button
-                                        type="primary"
-                                        htmlType="submit"
-                                        className="login-form-button"
-                                        style={{width: '100%'}}
-                                    >注册</Button>
-                                    <Button
-                                        type="primary"
-                                        htmlType="button"
-                                        className="login-form-button"
-                                        style={{width: '100%'}}
-                                        onClick={() => this.props.history.push('/')}
-                                    >登录</Button>
-                                </FormItem>
-                            </Form>
-                        </div>
+            <div>
+                <Form.Item>
+                    <h1 style={{textAlign: 'center'}}>欢迎登录</h1>
+                </Form.Item>
+                <FormItem label="用户名">
+                    {getFieldDecorator('username', {
+                        rules: [{required: true, message: '请输入用户名'}],
+                    })(
+                        <Input
+                            prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                            placeholder="用户名"
+                        />
+                    )}
+                </FormItem>
+                <FormItem label="密码">
+                    {getFieldDecorator('password', {
+                        rules: [{required: true, message: '请输入密码'}],
+                    })(
+                        <Input
+                            prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                            type="password"
+                            placeholder="密码"
+                        />
+                    )}
+                </FormItem>
+                <FormItem label="确认密码">
+                    {getFieldDecorator('passwordConfirm', {
+                        rules: [{required: true, message: '请输入密码'}],
+                    })(
+                        <Input
+                            prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
+                            type="password"
+                            placeholder="密码"
+                        />
+                    )}
+                </FormItem>
+                <FormItem>
+                    <Button
+                        type="primary"
+                        htmlType="submit"
+                        className="login-form-button"
+                        style={{width: '100%'}}
+                    >下一步</Button>
+                    <Button
+                        type="default"
+                        htmlType="button"
+                        className="login-form-button"
+                        style={{width: '100%'}}
+                        onClick={() => this.props.history.push('/login')}
+                    >已有账户,去登录</Button>
+                </FormItem>
+            </div>
+        );
+    }
+
+    _handleChange({ fileList }) {
+        this.setState({ fileList });
+    }
+
+    _getNextLayout() {
+        const uploadButton = (
+            <div>
+                <Icon type="plus" />
+                <div className="ant-upload-text">Upload</div>
+            </div>
+        );
+        return (
+            <FormItem>
+                <Upload
+                    action="/api/imgUpload"
+                    listType="picture-card"
+                    fileList={this.state.fileList}
+                    onChange={this._handleChange}
+                >
+                    {this.state.fileList.length >= 1 ? null : uploadButton}
+                </Upload>
+            </FormItem>
+        );
+    }
+
+    render() {
+        const step = this._getCurrentStep();
+        const layout = step === 0 ? this._getFirstLayout() : this._getNextLayout();
+        return (
+            <Content>
+                <Card bordered={false}>
+                    <div>
+                        <Steps current={step}>
+                            <Step title="填写基本信息" />
+                            <Step title="上传头像" />
+                            <Step title="完成" />
+                        </Steps>
                     </div>
-                </Content>
-            </Layout>
-        )
+                    <Form className="login-form" onSubmit={this._handleSubmit}>
+                        {layout}
+                    </Form>
+                </Card>
+            </Content>
+        );
     }
 }
 

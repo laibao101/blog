@@ -1,5 +1,7 @@
 const Router = require('express').Router;
 const passport = require('passport');
+const {getUuid, md5WithSalt} = require('../../util');
+const User = require('../../models/user');
 const router = new Router();
 
 const requireLogin = async (req, res, next) => {
@@ -29,7 +31,7 @@ router.post('/login', function (req, res, next) {
                 });
             }
 
-            req.logIn(user, function (err) {
+            req.logIn(user, (err) => {
                 if (err) {
                     return next(err);
                 }
@@ -45,8 +47,55 @@ router.post('/login', function (req, res, next) {
     }
 });
 
-router.post('/regist', function (req, res, next) {
+router.post('/register', async (req, res, next) => {
+    const body = req.body;
+    const checkResult = checkUser(body);
+    if (!checkResult.isValid) {
+        return res.json(checkResult);
+    }
 
+    try {
+        const users = await User.getUserByName(body.username);
+        const isUserExist = users[0].total > 0;
+        if(isUserExist) {
+            return res.json({
+                code: 1,
+                msg: '用户名已经存在',
+                data: {}
+            });
+        }
+    } catch (err) {
+        next(err);
+    }
+
+    try {
+        const uid = getUuid();
+        const nickname = getUuid();
+        const userData = {
+            uid,
+            uname: body.username,
+            password: md5WithSalt(body.password),
+            nickname,
+        };
+        await User.insertUser(userData);
+        req.login(userData, (err) => {
+            if (err) {
+                return next(err);
+            }
+            res.json({
+                code: 0,
+                msg: '注册成功',
+                data: {
+                    name: body.username,
+                    uid,
+                    nickname,
+                }
+            });
+        })
+    }
+    catch (err) {
+        next(err);
+    }
 });
 
 router.get('/logout', function (req, res, next) {
@@ -57,6 +106,28 @@ router.get('/logout', function (req, res, next) {
         data: {}
     });
 });
+
+const checkUser = (data) => {
+    if (!data.username) {
+        return {
+            isValid: false,
+            code: 1,
+            msg: '请输入用户名'
+        };
+    } else if (!data.password) {
+        return {
+            isValid: false,
+            code: 1,
+            msg: '请输入密码'
+        };
+    }
+
+    return {
+        isValid: true,
+        code: 0,
+        msg: ''
+    }
+};
 
 module.exports = {
     router,

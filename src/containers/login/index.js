@@ -97,7 +97,7 @@ class Login extends React.PureComponent {
                                         htmlType="button"
                                         className="login-form-button"
                                         style={{width: '100%'}}
-                                        onClick={() => this.props.history.push('/')}
+                                        onClick={() => this.props.history.push('/register')}
                                     >注册</Button>
                                 </FormItem>
                             </Form>
