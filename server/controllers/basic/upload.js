@@ -24,7 +24,7 @@ const upload = multer({ storage: storage });
 
 router.post('/uploadImg',upload.single('img'), async (req, res, next) => {
     try {
-        const imgUrl = path.join('\\static', req.file.filename);
+        const imgUrl = path.join('/static', req.file.filename);
         res.json({
             code: 0,
             msg: '上传成功',

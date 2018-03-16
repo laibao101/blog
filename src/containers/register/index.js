@@ -1,5 +1,5 @@
 import React from 'react';
-import {Layout, Form, Input, Icon, Button, notification, Steps, Card, message, Upload} from 'antd';
+import {Layout, Form, Input, Icon, Button, notification, Steps, Card, message, Upload, Modal} from 'antd';
 import {connect} from 'react-redux';
 import {Params} from "../../util";
 import {register} from '../../action/register'
@@ -14,8 +14,12 @@ class Register extends React.PureComponent {
         this.state = {
             fileList: [],
             step: 0,
+            previewVisible: false,
+            previewImage: '',
         };
         this._handleSubmit = this._handleSubmit.bind(this);
+        this._handleChange = this._handleChange.bind(this);
+        this._handlePreview = this._handlePreview.bind(this);
     }
 
     _handleSubmit(e) {
@@ -135,34 +139,54 @@ class Register extends React.PureComponent {
         );
     }
 
-    _handleChange({ fileList }) {
-        this.setState({ fileList });
+    _handleChange(info) {
+        // let fielList = info.fileList;
+        // fileList = fileList.slice(-2);
+        // this.setState({ fileList });
+        // if (info.file.status !== 'uploading') {
+        //     console.log(info.file, info.fileList);
+        // }
+        // if (info.file.status === 'done') {
+        //     message.success(`${info.file.name} file uploaded successfully`);
+        // } else if (info.file.status === 'error') {
+        //     message.error(`${info.file.name} file upload failed.`);
+        // }
     }
 
-    _getNextLayout() {
-        const uploadButton = (
-            <div>
-                <Icon type="plus" />
-                <div className="ant-upload-text">Upload</div>
-            </div>
-        );
-        return (
-            <FormItem>
-                <Upload
-                    action="/api/imgUpload"
-                    listType="picture-card"
-                    fileList={this.state.fileList}
-                    onChange={this._handleChange}
-                >
-                    {this.state.fileList.length >= 1 ? null : uploadButton}
-                </Upload>
-            </FormItem>
-        );
+    _handleCancel = () => this.setState({ previewVisible: false });
+
+    _handlePreview(file) {
+        this.setState({
+            previewImage: file.url || file.thumbUrl,
+            previewVisible: true,
+        });
     }
 
     render() {
         const step = this._getCurrentStep();
-        const layout = step === 0 ? this._getFirstLayout() : this._getNextLayout();
+        const props = {
+            name:"img",
+            action:"/api/uploadImg",
+            listType:"picture",
+            onChange:(info) => {
+                console.log(info);
+                let fileList = info.fileList;
+                fileList = fileList.slice(-1);
+                if (info.file.status !== 'uploading') {
+                    console.log(info.file, info.fileList);
+                }
+                this.setState({
+                    fileList,
+                });
+                if (info.file.status === 'done') {
+                    message.success(`${info.file.name} file uploaded successfully`);
+
+                } else if (info.file.status === 'error') {
+                    message.error(`${info.file.name} file upload failed.`);
+                }
+            },
+            onPreview:this._handlePreview,
+        };
         return (
             <Content>
                 <Card bordered={false}>
@@ -174,7 +198,26 @@ class Register extends React.PureComponent {
                         </Steps>
                     </div>
                     <Form className="login-form" onSubmit={this._handleSubmit}>
-                        {layout}
+                        {
+                            step === 0 ?
+                                this._getFirstLayout()
+                                :
+                                (
+                                    <FormItem>
+                                        <Upload
+                                            {...props}
+                                            fileList={this.state.fileList}
+                                        >
+                                            <Button>
+                                                <Icon type="upload" /> upload
+                                            </Button>
+                                        </Upload>
+                                        <Modal visible={this.state.previewVisible} footer={null} onCancel={this._handleCancel}>
+                                            <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                        </Modal>
+                                    </FormItem>
+                                )
+                        }
                     </Form>
                 </Card>
             </Content>
@@ -184,6 +227,6 @@ class Register extends React.PureComponent {
 
 
 export default connect(
-    state => state.register,
+    state => state,
     {register}
 )(Form.create()(Register));
