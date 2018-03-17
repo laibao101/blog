@@ -49,14 +49,13 @@ class Editor extends React.PureComponent {
                                 failure(`HTTP Error: ${xhr.status}`);
                                 return;
                             }
-                            console.log(xhr.responseText)
                             json = JSON.parse(xhr.responseText);
-                            if (!json || typeof json.data.original !== 'string') {
+                            if (!json || typeof json.data.imgUrl !== 'string') {
                                 failure(`Invalid JSON: ${xhr.responseText}`);
                                 return;
                             }
                             // 成功后将服务器图片地址替换源 src 中地址
-                            success(json.data.original);
+                            success(json.data.imgUrl);
                         };
                         formData = new FormData();
                         formData.append('img', blobInfo.blob(), blobInfo.filename());
