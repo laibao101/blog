@@ -1,5 +1,6 @@
 const Router = require('express').Router;
 const Post = require('../../models/post');
+const Comment = require('../../models/comment');
 
 const router = new Router();
 
@@ -76,6 +77,41 @@ router.get('/like', async (req, res, next) => {
             data: {}
         });
     } catch (err) {
+        next(err);
+    }
+});
+
+router.post('/comment', async (req,res, next) => {
+    const body = req.body;
+    if(!body.id){
+        return res.json({
+            code: 1,
+            msg: '缺少id',
+            data: {},
+        });
+    }else if(!body.comment) {
+        return res.json({
+            code: 1,
+            msg: '缺少comment',
+            data: {},
+        });
+    }
+
+    try {
+        const result = await Comment.addComment(body);
+        if(result.affectedRows > 0) {
+            return res.json({
+                code: 0,
+                msg: '评论成功',
+                data: {},
+            });
+        }
+        res.json({
+            code: 1,
+            msg: '评论失败',
+            data: {},
+        });
+    }catch (err){
         next(err);
     }
 });
