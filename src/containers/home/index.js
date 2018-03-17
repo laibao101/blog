@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {Link, withRouter} from "react-router-dom";
 import {getTableList, like} from '../../action/home';
 import {Time, QueryString} from "../../util";
+import CommentView from "./CommentView";
 
 class Home extends React.PureComponent {
     constructor(props) {
@@ -147,7 +148,7 @@ class Home extends React.PureComponent {
                                                 <div>
                                                     <Icon type="book"/> 分类:{item.categoryName}
                                                 </div>,
-                                                <div><Icon type="edit"/> 评论</div>,
+                                                <CommentView />,
                                                 <Tooltip
                                                     arrowPointAtCenter
                                                     title="老铁，点个赞咯"
