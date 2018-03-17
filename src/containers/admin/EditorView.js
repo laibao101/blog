@@ -1,8 +1,9 @@
 import React from "react";
-import {Form, Input, Modal, Select, notification} from "antd";
+import {Form, Input, Modal, Select, notification, Button} from "antd";
 import {connect} from 'react-redux';
 import {getCategories, getPostData, addPost, editPost} from '../../action/admin'
 import {Params} from "../../util";
+import ModalEditor from "../../components/Mceditor/ModalEditor";
 
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -22,7 +23,9 @@ class EditorView extends React.PureComponent {
         super();
         this.state = {
             loading: false,
-            options: null
+            options: null,
+            mode: false,
+            content: '<h1>hello world</h1>'
         };
         this._onOk = this._onOk.bind(this);
         this._onClose = this._onClose.bind(this);
@@ -140,76 +143,107 @@ class EditorView extends React.PureComponent {
     _onClose() {
         this.props.onOk(false);
     }
-
+    _changeMode(status) {
+        this.setState({
+            mode: status,
+        });
+    }
     render() {
         const {mode, form, options = []} = this.props;
         const {getFieldDecorator} = form;
         const categories = this._genOptions(options);
         return (
-            <Modal
-                title={mode === 'add' ? '新增post' : '编辑post'}
-                visible
-                onOk={this._onOk}
-                onCancel={this._onClose}
-                confirmLoading={this.state.loading}
-            >
-                <Form>
-                    <FormItem
-                        {...formItemLayout}
-                        label="标题"
-                    >
-                        {getFieldDecorator('title', {
-                            rules: [
-                                {required: true, message: '请输入标题'},
-                                {max: 20, message: '最多输入20个字符'}
-                            ]
-                        })(
-                            <Input type="text"/>
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="摘要"
-                    >
-                        {getFieldDecorator('abstract', {
-                            rules: [
-                                {required: true, message: '请输入摘要'},
-                                {max: 50, message: '最多输入50个字符'}
-                            ]
-                        })(
-                            <Input type="text"/>
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="正文"
-                    >
-                        {getFieldDecorator('content', {
-                            rules: [
-                                {required: true, message: '请输入正文'}
-                            ]
-                        })(
-                            <Input type="text"/>
-                        )}
-                    </FormItem>
-                    <FormItem
-                        {...formItemLayout}
-                        label="分类"
-                    >
-                        {getFieldDecorator('category', {
-                            rules: [
-                                {required: true, message: '请选择分类'}
-                            ]
-                        })(
-                            <Select
-                                placeholder="请选择分类"
-                            >
-                                {categories}
-                            </Select>
-                        )}
-                    </FormItem>
-                </Form>
-            </Modal>
+            <div>
+                {
+                    this.state.mode ?
+                        (
+                            <ModalEditor
+                                onOk={(data) => {
+                                    this.setState({
+                                        content: data,
+                                        mode: false,
+                                    })
+                                }}
+                                onClose={() => {
+                                    this._changeMode(false);
+                                }}
+                                content={this.state.content}
+                            />
+                        ) : null
+                }
+                <Modal
+                    title={mode === 'add' ? '新增post' : '编辑post'}
+                    visible
+                    onOk={this._onOk}
+                    onCancel={this._onClose}
+                    confirmLoading={this.state.loading}
+                >
+                    <Form>
+                        <FormItem
+                            {...formItemLayout}
+                            label="标题"
+                        >
+                            {getFieldDecorator('title', {
+                                rules: [
+                                    {required: true, message: '请输入标题'},
+                                    {max: 20, message: '最多输入20个字符'}
+                                ]
+                            })(
+                                <Input type="text"/>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label="摘要"
+                        >
+                            {getFieldDecorator('abstract', {
+                                rules: [
+                                    {required: true, message: '请输入摘要'},
+                                    {max: 50, message: '最多输入50个字符'}
+                                ]
+                            })(
+                                <Input type="text"/>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label="正文"
+                        >
+                            {getFieldDecorator('content', {
+                                rules: [
+                                    {required: true, message: '请输入正文'}
+                                ]
+                            })(
+                                <div>
+                                    <Button
+                                        onClick={() => {
+                                            this._changeMode(true);
+                                        }}
+                                    >
+                                        编辑正文
+                                    </Button>
+                                </div>
+                            )}
+                        </FormItem>
+                        <FormItem
+                            {...formItemLayout}
+                            label="分类"
+                        >
+                            {getFieldDecorator('category', {
+                                rules: [
+                                    {required: true, message: '请选择分类'}
+                                ]
+                            })(
+                                <Select
+                                    placeholder="请选择分类"
+                                >
+                                    {categories}
+                                </Select>
+                            )}
+                        </FormItem>
+                    </Form>
+                </Modal>
+            </div>
         );
     }
 }

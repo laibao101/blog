@@ -36,11 +36,11 @@ class AdminLayout extends React.PureComponent {
     };
 
     componentWillMount() {
-        this._checkLogin();
+        // this._checkLogin();
     }
 
     componentWillReceiveProps() {
-        this._checkLogin();
+        // this._checkLogin();
     }
 
     _checkLogin() {

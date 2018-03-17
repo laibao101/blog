@@ -32,7 +32,7 @@ class Editor extends React.PureComponent {
                     '新宋体=NSimSun;' +
                     '黑体=SimHei;' +
                     '微软雅黑=Microsoft YaHei',
-                    content_css: '../../../public/tinymce/js/MceContent.css',
+                    content_css: '/tinymce/js/MceContent.css',
                     fontsize_formats: '12pt 14pt 18pt 24pt 36pt',
                     images_upload_handler: (blobInfo, success, failure) => {
                         // 图片上传方法
@@ -41,7 +41,7 @@ class Editor extends React.PureComponent {
 
                         xhr = new XMLHttpRequest();
                         xhr.withCredentials = false;
-                        xhr.open('POST', '/api/img');
+                        xhr.open('POST', '/api/uploadImg');
 
                         xhr.onload = () => {
                             var json;
@@ -49,6 +49,7 @@ class Editor extends React.PureComponent {
                                 failure(`HTTP Error: ${xhr.status}`);
                                 return;
                             }
+                            console.log(xhr.responseText)
                             json = JSON.parse(xhr.responseText);
                             if (!json || typeof json.data.original !== 'string') {
                                 failure(`Invalid JSON: ${xhr.responseText}`);
@@ -58,7 +59,7 @@ class Editor extends React.PureComponent {
                             success(json.data.original);
                         };
                         formData = new FormData();
-                        formData.append('file', blobInfo.blob(), blobInfo.filename());
+                        formData.append('img', blobInfo.blob(), blobInfo.filename());
                         xhr.send(formData);
                     },
                 }}
