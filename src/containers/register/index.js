@@ -168,8 +168,8 @@ class Register extends React.PureComponent {
     render() {
         const step = this._getCurrentStep();
         const props = {
-            name: "img",
-            action: "/api/uploadImg",
+            name: "avatar",
+            action: "/api/avatar",
             listType: "picture-card",
             onChange: this._handleChange,
             onPreview: this._handlePreview,

@@ -19,7 +19,7 @@ const setUserStatus = (uid, status) => {
     return connect.query(setUserStatusSql, [status, uid]);
 };
 
-const getUserSql = `select uid,uname,nickname,password from user where user.uname = ?`;
+const getUserSql = `select uid,uname,nickname,password,avatar from user where user.uname = ?`;
 const getUser = (uname) => {
     const connect = getConnection();
     return connect.query(getUserSql, [uname]);
@@ -37,11 +37,18 @@ const getUserByName = (uname) => {
     return connect.query(getUserByNameSql, [uname]);
 };
 
+const setUserAvatarSql = `update user set user.avatar = ? where uid = ?`;
+const setUserAvatar = (avatar, uid) => {
+    const connect = getConnection();
+    return connect.query(setUserAvatarSql, [avatar, uid]);
+};
+
 module.exports = {
     insertUser,
     getUsers,
     setUserStatus,
     getUser,
     getUserByName,
-    getUserByUid
+    getUserByUid,
+    setUserAvatar
 };

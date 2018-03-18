@@ -67,6 +67,7 @@ export const login = (data) => async dispatch => {
                 uid: res.data.uid,
                 name: res.data.name,
                 nickname: res.data.nickname,
+                avatar: res.data.avatar,
             }
         });
         return res;

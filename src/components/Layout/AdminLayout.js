@@ -31,7 +31,10 @@ class AdminLayout extends React.PureComponent {
 
     _handleLogout = ({key}) => {
         if (key === 'logout') {
-            this.props.logout();
+            this.props.logout()
+                .then(() => {
+                    this._checkLogin();
+                });
         }
     };
 
@@ -117,7 +120,7 @@ class AdminLayout extends React.PureComponent {
                                           <Avatar
                                               shape="square"
                                               size="large"
-                                              src={userInfo.avatar || userLogo}
+                                              src={`/static/${userInfo.avatar}` || userLogo}
                                           />
                                           <span>{userInfo.nickname}</span>
                                       </Badge>

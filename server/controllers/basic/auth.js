@@ -2,6 +2,7 @@ const Router = require('express').Router;
 const passport = require('passport');
 const {getUuid, md5WithSalt} = require('../../util');
 const User = require('../../models/user');
+const {upload} = require("./upload");
 const router = new Router();
 
 const requireLogin = async (req, res, next) => {
@@ -16,7 +17,7 @@ const requireLogin = async (req, res, next) => {
     }
 };
 
-router.post('/login', function (req, res, next) {
+router.post('/login', (req, res, next) => {
     try {
         passport.authenticate('local', function (err, user) {
             console.log('local->', err, user);
@@ -41,6 +42,7 @@ router.post('/login', function (req, res, next) {
                         uid: user.uid,
                         name: user.uname,
                         nickname: user.nickname,
+                        avatar: user.avatar,
                     },
                     msg: "登录成功",
                 });
@@ -61,7 +63,7 @@ router.post('/register', async (req, res, next) => {
     try {
         const users = await User.getUserByName(body.username);
         const isUserExist = users[0].total > 0;
-        if(isUserExist) {
+        if (isUserExist) {
             return res.json({
                 code: 1,
                 msg: '用户名已经存在',
@@ -102,13 +104,45 @@ router.post('/register', async (req, res, next) => {
     }
 });
 
-router.get('/logout', function (req, res, next) {
+router.get('/logout', (req, res, next) => {
     req.logout();
     res.json({
         code: 0,
         msg: '登出成功',
         data: {}
     });
+});
+
+router.post('/avatar', upload.single('avatar'), async (req, res, next) => {
+    if (!req.user) {
+        return res.json({
+            code: 1,
+            msg: '没有注册',
+            data: {},
+        });
+    }
+    try {
+        const result = await User.setUserAvatar(req.file.filename, req.user);
+        if (result.affectedRows > 0) {
+            const imgUrl = `/static/${req.file.filename}`;
+            return res.json({
+                code: 0,
+                msg: '设置头像成功',
+                data: {
+                    imgUrl,
+                    originalname: req.file.originalname,
+                    size: req.file.size
+                }
+            });
+        }
+        res.json({
+            code: 1,
+            msg: '设置头像失败',
+            data: {}
+        });
+    } catch (err) {
+        next(err);
+    }
 });
 
 const checkUser = (data) => {
