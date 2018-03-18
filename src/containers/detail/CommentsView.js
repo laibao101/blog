@@ -1,10 +1,16 @@
 import React from "react";
 import {Card, List} from "antd";
 import marked from "marked";
+import Highlight from 'highlight.js';
 import Time from "../../util/Time";
 
 export default class CommentsView extends React.PureComponent {
     render() {
+        marked.setOptions({
+            highlight: function(code) {
+                return Highlight.highlightAuto(code).value;
+            },
+        });
         const {comments} = this.props;
         return (
             <Card
