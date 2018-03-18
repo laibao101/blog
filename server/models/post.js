@@ -12,7 +12,7 @@ const insertPost = (data) => {
     return connect.query(insertPostSql, [data.title, data.abstract, data.content, data.author, data.ctime, data.category, data.status]);
 };
 
-const getPostSql = `SELECT posts.*, user.uid, user.uname, user.nickname,category.name as categoryName, category.categoryId  from posts INNER JOIN user on posts.author = user.uid INNER JOIN category ON posts.category = category.categoryId WHERE posts.id = ?`;
+const getPostSql = `SELECT posts.*, user.uid, user.uname, user.nickname,category.name as categoryName, category.categoryId  from posts INNER JOIN user on posts.author = user.uid INNER JOIN category ON posts.category = category.id WHERE posts.id = ?`;
 const getPost = (id) => {
     const connect = getConnection();
     return connect.query(getPostSql, [id]);

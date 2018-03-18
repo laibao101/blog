@@ -44,6 +44,7 @@ router.get('/post', async (req, res, next) => {
     }
     try {
         const post = await Post.getPost(postId);
+        console.log(post)
         return res.json({
             code: 0,
             msg: '获取post成功',
@@ -156,13 +157,6 @@ router.get('/users', async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-});
-
-/**
- * 添加user
- */
-router.post('/user', async (req, res, next) => {
-
 });
 
 /**

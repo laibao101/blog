@@ -37,7 +37,7 @@ class ModalEditor extends React.Component {
         return (
             <div>
                 <Modal
-                    width="1000"
+                    width="80%"
                     visible
                     maskClosable={false}
                     confirmLoading={false}

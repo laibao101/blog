@@ -25,10 +25,11 @@ class EditorView extends React.PureComponent {
             loading: false,
             options: null,
             mode: false,
-            content: '<h1>hello world</h1>'
+            content: '',
         };
         this._onOk = this._onOk.bind(this);
         this._onClose = this._onClose.bind(this);
+        this._editorOk = this._editorOk.bind(this);
     }
 
     componentWillMount() {
@@ -65,6 +66,10 @@ class EditorView extends React.PureComponent {
             abstract: data.abstract,
             content: data.content,
             category: data.category
+        });
+        // 设置富文本数据
+        this.setState({
+            content: data.content,
         });
     }
 
@@ -143,11 +148,23 @@ class EditorView extends React.PureComponent {
     _onClose() {
         this.props.onOk(false);
     }
+
     _changeMode(status) {
         this.setState({
             mode: status,
         });
     }
+
+    _editorOk(data) {
+        this.setState({
+            content: data,
+            mode: false,
+        });
+        this.props.form.setFieldsValue({
+            content: data,
+        });
+    }
+
     render() {
         const {mode, form, options = []} = this.props;
         const {getFieldDecorator} = form;
@@ -158,12 +175,7 @@ class EditorView extends React.PureComponent {
                     this.state.mode ?
                         (
                             <ModalEditor
-                                onOk={(data) => {
-                                    this.setState({
-                                        content: data,
-                                        mode: false,
-                                    })
-                                }}
+                                onOk={this._editorOk}
                                 onClose={() => {
                                     this._changeMode(false);
                                 }}
