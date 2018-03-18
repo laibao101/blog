@@ -4,7 +4,7 @@ import zhCN from 'antd/lib/locale-provider/zh_CN';
 import GlobalFooter from "../GlobalFooter";
 import {connect} from "react-redux";
 import {logout} from "../../action/app";
-
+import userLogo from '../../static/img/logo.png'
 const {Header, Sider, Content} = Layout;
 
 class AdminLayout extends React.PureComponent {
@@ -59,6 +59,7 @@ class AdminLayout extends React.PureComponent {
                 <Menu.Item key="logout"><Icon type="logout"/>退出登录</Menu.Item>
             </Menu>
         );
+        const {userInfo} = this.props;
         return (
             <div>
                 <Layout style={{minHeight: '100vh'}}>
@@ -115,11 +116,10 @@ class AdminLayout extends React.PureComponent {
                                       <Badge dot>
                                           <Avatar
                                               shape="square"
-                                              icon="user"
                                               size="large"
-                                          >
-                                              {this.props.userInfo.nickname}
-                                          </Avatar>
+                                              src={userInfo.avatar || userLogo}
+                                          />
+                                          <span>{userInfo.nickname}</span>
                                       </Badge>
                                     </Dropdown>
                                 </span>
