@@ -1,5 +1,6 @@
 import React from "react";
 import {Card, List} from "antd";
+import marked from "marked";
 import Time from "../../util/Time";
 
 export default class CommentsView extends React.PureComponent {
@@ -23,7 +24,8 @@ export default class CommentsView extends React.PureComponent {
                                         float: 'left',
                                         flex: 1,
                                     }}
-                                >{item.content}</span>
+                                    dangerouslySetInnerHTML={{__html:  marked(item.content)}}
+                                />
                                 <span
                                     style={{
                                         float: 'right',

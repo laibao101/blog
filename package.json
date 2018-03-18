@@ -11,6 +11,7 @@
         "express-mysql-session": "^1.2.3",
         "express-session": "^1.15.6",
         "isomorphic-unfetch": "^2.0.0",
+        "marked": "^0.3.17",
         "md5": "^2.2.1",
         "mime": "^2.2.0",
         "moment": "^2.21.0",
