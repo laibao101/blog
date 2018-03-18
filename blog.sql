@@ -1,7 +1,7 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
+Source Server         : 本地
 Source Server Version : 50717
 Source Host           : localhost:3306
 Source Database       : blog
@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50717
 File Encoding         : 65001
 
-Date: 2018-03-18 16:55:31
+Date: 2018-03-18 22:06:40
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -106,7 +106,6 @@ CREATE TABLE `sessions` (
 -- ----------------------------
 -- Records of sessions
 -- ----------------------------
-INSERT INTO `sessions` VALUES ('n1ngEIaARq-LLSttBdvczAMyxjzAD1EP', '1521363902', 0x7B22636F6F6B6965223A7B226F726967696E616C4D6178416765223A3630303030302C2265787069726573223A22323031382D30332D31385430393A30353A30312E3733325A222C22736563757265223A66616C73652C22687474704F6E6C79223A747275652C2270617468223A222F227D2C2270617373706F7274223A7B2275736572223A2231646262666436372D373262362D343966362D396434302D646663343964633234353538227D7D);
 
 -- ----------------------------
 -- Table structure for user
@@ -119,15 +118,12 @@ CREATE TABLE `user` (
   `nickname` varchar(60) NOT NULL,
   `password` varchar(60) NOT NULL,
   `status` int(1) NOT NULL DEFAULT '1',
+  `avatar` varchar(60) DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', '1dbbfd67-72b6-49f6-9d40-dfc49dc24558', 'admin', 'admin', 'fdb93343548e548af01bcce98008dbfa', '1');
-INSERT INTO `user` VALUES ('2', '6f57e05f-e373-45d2-8f05-f50f8714afa1', 'admin1', '0f3d5fb4-16b9-4e3e-9bba-b05470b246cc', 'fdb93343548e548af01bcce98008dbfa', '1');
-INSERT INTO `user` VALUES ('3', 'c2a47a02-ab99-4486-99c7-695784014bd8', 'admin2', 'a5e068ce-30b5-44c4-b7bc-82d9918b0d76', 'fdb93343548e548af01bcce98008dbfa', '1');
-INSERT INTO `user` VALUES ('4', '4d9c4d69-410d-4955-a114-27c89ac718e8', 'admin3', '0ee4a26c-938d-4bd7-836d-757828252127', 'fdb93343548e548af01bcce98008dbfa', '1');
-INSERT INTO `user` VALUES ('5', '767d73ce-c75c-4fde-af7d-5bc6480cfd5f', 'admin3', '1fd1551e-3c25-477a-8762-36fe55da13a3', 'fdb93343548e548af01bcce98008dbfa', '1');
-INSERT INTO `user` VALUES ('6', 'f14fe410-0ef2-41e5-9e28-f13a40a508a1', 'admin4', '38d30b8c-21e2-4c87-89fb-f905d9e1f956', 'fdb93343548e548af01bcce98008dbfa', '1');
+INSERT INTO `user` VALUES ('1', '1dbbfd67-72b6-49f6-9d40-dfc49dc24558', 'admin', 'admin', 'fdb93343548e548af01bcce98008dbfa', '1', '');
+INSERT INTO `user` VALUES ('8', 'aec08b9c-7948-4043-8343-b2891d7291ca', 'admin1', '53528556-768a-41a4-8aae-df0c859368d9', 'fdb93343548e548af01bcce98008dbfa', '1', '1521380077853.jpeg');
