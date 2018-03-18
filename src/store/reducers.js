@@ -5,5 +5,6 @@ import admin from '../action/admin';
 import category from '../action/category';
 import user from '../action/user';
 import app from '../action/app';
+import detail from '../action/detail';
 
-export default combineReducers({home, login, admin, category, user, app});
+export default combineReducers({home, login, admin, category, user, app, detail});

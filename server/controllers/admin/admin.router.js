@@ -1,7 +1,7 @@
 const moment = require('moment');
 const Router = require('express').Router;
 const xss = require('xss');
-const {md5WithSalt, getUuid} = require("../../util");
+const {getUuid} = require("../../util");
 const nodeExcel = require('excel-export');
 const Post = require('../../models/post');
 const Category = require('../../models/category');

@@ -1,42 +1,69 @@
 import React from "react";
-import {Card,notification} from "antd";
-import moment from "moment/moment";
-import Http from "../../util/Http";
+import {Card, notification} from "antd";
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
+import CommentsView from "./CommentsView";
+import ReplyView from "./ReplyView";
+import {getDetailData} from "../../action/detail";
+import {Time} from "../../util";
+import {comment} from "../../action/home";
 
-export default class Detail extends React.Component{
-    constructor(){
+class Detail extends React.Component {
+    constructor() {
         super();
         this.state = {
-            post:{}
+            post: {}
         };
+        this._handleSubmit = this._handleSubmit.bind(this);
     }
+
     _formatTime(time) {
         if (time === '0') {
             return '';
         }
-        return <span>{moment(Number(time)).format('YYYY-MM-DD HH:mm:ss')}</span>;
-    }
-    componentWillMount(){
-        const {id} = this.props.match.params;
-        this._getDetailData(id);
+        return <span>{Time.formatTime(time)}</span>;
     }
 
-    async _getDetailData(id) {
-        try {
-            const res = await Http.get(`/blog/post?id=${id}`);
-            this.setState({
-                post: res.data.post
-            });
-        }catch (err){
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
+    componentWillMount() {
+        this._getDetail();
+    }
+
+    _getDetail() {
+        const id = this._getId();
+        if(id) {
+            this.props.getDetailData({id})
+                .catch(err => notification.error({
+                    message: '请求错误',
+                    description: err.reason
+                }));
         }
     }
+
+    _getId() {
+        return this.props.match.params.id;
+    }
+
+    _handleSubmit(comment) {
+        this.props.comment({
+            comment,
+            id: this._getId(),
+        })
+            .then(async res => {
+                notification.success({
+                    message: '评论成功',
+                    description: res.msg,
+                });
+                this._getDetail();
+            })
+            .catch(err => notification.error({
+                message: '请求错误',
+                description: err.reason,
+            }));
+    }
+
     render() {
-        const {post} = this.state;
+        const {post = {}, comments = []} = this.props;
+        const id = this._getId();
         return (
             <div>
                 <Card
@@ -50,21 +77,33 @@ export default class Detail extends React.Component{
                         {post.title}
                     </Card>
                     <Card
-                        style={{ marginTop: 16 }}
+                        style={{marginTop: 16}}
                         type="inner"
                         title={<h2>发布时间</h2>}
                     >
                         {this._formatTime(post.ctime)}
                     </Card>
                     <Card
-                        style={{ marginTop: 16 }}
+                        style={{marginTop: 16}}
                         type="inner"
                         title={<h2>内容</h2>}
                     >
-                        <p dangerouslySetInnerHTML={{ __html: post.content}} />
+                        <p dangerouslySetInnerHTML={{__html: post.content}}/>
                     </Card>
                 </Card>
+                <CommentsView
+                    comments={comments}
+                />
+                <ReplyView
+                    id={id}
+                    onSubmit={this._handleSubmit}
+                />
             </div>
         )
     }
 }
+
+export default connect(
+    state => state.detail,
+    {getDetailData, comment}
+)(Detail)

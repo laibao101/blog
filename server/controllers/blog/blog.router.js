@@ -44,13 +44,13 @@ router.get('/post', async (req, res, next) => {
     }
     try {
         const post = await Post.getPost(postId);
-        const commentTotal = await Comment.countByPostId(post.id) || 0;
-        post.comment = commentTotal[0].total;
+        const comments = await Comment.getCommentsById(postId);
         return res.json({
             code: 0,
             msg: '获取post成功',
             data: {
-                post: post[0]
+                post: post[0],
+                comments
             }
         });
     } catch (err) {
@@ -104,6 +104,7 @@ router.post('/comment', async (req,res, next) => {
     }
 
     try {
+        body.time = Date.now();
         const result = await Comment.addComment(body);
         if(result.affectedRows > 0) {
             return res.json({
