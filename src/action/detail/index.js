@@ -8,7 +8,11 @@ const actionTypes = {
 
 const initState = {
     loading: false,
-    post: {},
+    post: {
+        title: '',
+        ctime: '',
+        content: '',
+    },
     comments: [],
 };
 

@@ -1,9 +1,10 @@
 import React from "react";
-import {Form, Input, Modal, Select, notification, Button} from "antd";
+import {Form, Input, Modal, Select, notification, Button, Popconfirm} from "antd";
 import {connect} from 'react-redux';
 import {getCategories, getPostData, addPost, editPost} from '../../action/admin'
 import {Params} from "../../util";
 import ModalEditor from "../../components/Mceditor/ModalEditor";
+import ModalMde from "../../components/SimpleMde/ModalMde";
 
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -26,10 +27,12 @@ class EditorView extends React.PureComponent {
             options: null,
             mode: false,
             content: '',
+            mdMode: false,
         };
         this._onOk = this._onOk.bind(this);
         this._onClose = this._onClose.bind(this);
         this._editorOk = this._editorOk.bind(this);
+        this._mdEditorOk = this._mdEditorOk.bind(this);
     }
 
     componentWillMount() {
@@ -165,6 +168,22 @@ class EditorView extends React.PureComponent {
         });
     }
 
+    _changeMdMode(status) {
+        this.setState({
+            mdMode: status,
+        });
+    }
+
+    _mdEditorOk(data) {
+        this.setState({
+            content: data,
+            mdMode: false,
+        });
+        this.props.form.setFieldsValue({
+            content: data,
+        });
+    }
+
     render() {
         const {mode, form, options = []} = this.props;
         const {getFieldDecorator} = form;
@@ -180,6 +199,18 @@ class EditorView extends React.PureComponent {
                                     this._changeMode(false);
                                 }}
                                 content={this.state.content}
+                            />
+                        ) : null
+                }
+                {
+                    this.state.mdMode ?
+                        (
+                            <ModalMde
+                                onOk={this._mdEditorOk}
+                                onClose={() => {
+                                    this._changeMdMode(false);
+                                }}
+                                value={this.state.content}
                             />
                         ) : null
                 }
@@ -227,13 +258,24 @@ class EditorView extends React.PureComponent {
                                 ]
                             })(
                                 <div>
-                                    <Button
-                                        onClick={() => {
+                                    <Popconfirm
+                                        okText="markdown"
+                                        cancelText="富文本"
+                                        okType="default"
+                                        title="请选择格式"
+                                        onConfirm={() => {
+                                            this._changeMdMode(true)
+                                        }}
+                                        onCancel={() => {
                                             this._changeMode(true);
                                         }}
                                     >
-                                        编辑正文
-                                    </Button>
+                                        <Button
+                                            icon="edit"
+                                        >
+                                            编辑正文
+                                        </Button>
+                                    </Popconfirm>
                                 </div>
                             )}
                         </FormItem>

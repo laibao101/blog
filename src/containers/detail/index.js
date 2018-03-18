@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import CommentsView from "./CommentsView";
 import ReplyView from "./ReplyView";
 import {getDetailData} from "../../action/detail";
-import {Time} from "../../util";
+import {Time, Marked} from "../../util";
 import {comment} from "../../action/home";
 
 class Detail extends React.Component {
@@ -88,7 +88,7 @@ class Detail extends React.Component {
                         type="inner"
                         title={<h2>内容</h2>}
                     >
-                        <p dangerouslySetInnerHTML={{__html: post.content}}/>
+                        <p dangerouslySetInnerHTML={{__html: Marked.renderToHtml(post.content)}}/>
                     </Card>
                 </Card>
                 <CommentsView
