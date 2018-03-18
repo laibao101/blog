@@ -27,6 +27,7 @@
         "react-tinymce": "^0.7.0",
         "redux": "^3.7.2",
         "redux-thunk": "^2.2.0",
+        "simplemde": "^1.11.2",
         "uuid": "^3.2.1",
         "xss": "^0.3.7"
     },

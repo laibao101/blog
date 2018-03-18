@@ -20,7 +20,6 @@ export default class Detail extends React.Component{
     componentWillMount(){
         const {id} = this.props.match.params;
         this._getDetailData(id);
-
     }
 
     async _getDetailData(id) {
@@ -46,23 +45,23 @@ export default class Detail extends React.Component{
                 >
                     <Card
                         type="inner"
-                        title="标题"
+                        title={<h2>标题</h2>}
                     >
                         {post.title}
                     </Card>
                     <Card
                         style={{ marginTop: 16 }}
                         type="inner"
-                        title="发布时间"
+                        title={<h2>发布时间</h2>}
                     >
                         {this._formatTime(post.ctime)}
                     </Card>
                     <Card
                         style={{ marginTop: 16 }}
                         type="inner"
-                        title="内容"
+                        title={<h2>内容</h2>}
                     >
-                        {post.content}
+                        <p dangerouslySetInnerHTML={{ __html: post.content}} />
                     </Card>
                 </Card>
             </div>

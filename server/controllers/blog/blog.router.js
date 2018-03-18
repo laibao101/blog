@@ -9,6 +9,10 @@ router.get('/posts', async (req, res) => {
         const page = req.query.page - 1 || 0;
         const limit = req.query.limit || 5;
         const posts = await Post.getPosts(page * limit, Number(limit));
+        for (let i =0, len = posts.length; i < len; i++) {
+            const commentTotal = await Comment.countByPostId(posts[i].id) || 0;
+            posts[i].comment = commentTotal[0].total;
+        }
         const totalRes = await Post.getPostsTotal();
         res.send({
             code: 0,
@@ -40,6 +44,8 @@ router.get('/post', async (req, res, next) => {
     }
     try {
         const post = await Post.getPost(postId);
+        const commentTotal = await Comment.countByPostId(post.id) || 0;
+        post.comment = commentTotal[0].total;
         return res.json({
             code: 0,
             msg: '获取post成功',

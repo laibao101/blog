@@ -1,5 +1,6 @@
 const moment = require('moment');
 const Router = require('express').Router;
+const xss = require('xss');
 const {md5WithSalt, getUuid} = require("../../util");
 const nodeExcel = require('excel-export');
 const Post = require('../../models/post');
@@ -44,7 +45,6 @@ router.get('/post', async (req, res, next) => {
     }
     try {
         const post = await Post.getPost(postId);
-        console.log(post)
         return res.json({
             code: 0,
             msg: '获取post成功',
@@ -196,6 +196,7 @@ router.post('/post', async (req, res, next) => {
         body.author = author;
         body.ctime = ctime;
         body.status = 1;
+        body.content = xss(body.content);
         const result = await Post.insertPost(body);
         if (result.insertId) {
             return res.json({

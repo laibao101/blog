@@ -67,7 +67,11 @@ export const finishLoading = () => ({
 });
 
 export const like = data => async () => {
-    return await Http.get('/blog/likes', data);
+    return await Http.get('/blog/like', data);
+};
+
+export const comment = data => async () => {
+    return await Http.post('/blog/comment', data);
 };
 
 export default homeAction;

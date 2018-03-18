@@ -2,7 +2,7 @@ import React from "react";
 import {Card, Icon, List, Pagination, notification, Spin, Tooltip} from "antd";
 import {connect} from 'react-redux';
 import {Link, withRouter} from "react-router-dom";
-import {getTableList, like} from '../../action/home';
+import {comment, getTableList, like} from '../../action/home';
 import {Time, QueryString} from "../../util";
 import CommentView from "./CommentView";
 
@@ -14,6 +14,7 @@ class Home extends React.PureComponent {
         };
         this.limit = 5;
         this._paginateChange = this._paginateChange.bind(this);
+        this._submitComment = this._submitComment.bind(this);
     }
 
     componentWillMount() {
@@ -86,7 +87,7 @@ class Home extends React.PureComponent {
      * @param page 当前页数
      * @private
      */
-    async _updateList(page = 1) {
+    async _updateList(page = this._getPage()) {
         await this.props.getTableList({
             page,
             limit: this.limit
@@ -100,6 +101,24 @@ class Home extends React.PureComponent {
      */
     _getPage() {
         return parseInt(QueryString.getQueryString(this.props.location.search.substring(1)).page, 10) || 1;
+    }
+
+    _submitComment(comment, id) {
+        this.props.comment({
+            comment,
+            id,
+        })
+            .then(async res => {
+                notification.success({
+                    message: '评论成功',
+                    description: res.msg,
+                });
+                await this._updateList();
+            })
+            .catch(err => notification.error({
+                message: '请求错误',
+                description: err.reason,
+            }));
     }
 
     render() {
@@ -148,7 +167,12 @@ class Home extends React.PureComponent {
                                                 <div>
                                                     <Icon type="book"/> 分类:{item.categoryName}
                                                 </div>,
-                                                <CommentView />,
+                                                <CommentView
+                                                    onSubmit={(content) => {
+                                                        this._submitComment(content, item.id)
+                                                    }}
+                                                    count={item.comment}
+                                                />,
                                                 <Tooltip
                                                     arrowPointAtCenter
                                                     title="老铁，点个赞咯"
@@ -189,5 +213,5 @@ class Home extends React.PureComponent {
 
 export default connect(
     state => state.home,
-    {getTableList, like}
+    {getTableList, like, comment}
 )(withRouter(Home));
