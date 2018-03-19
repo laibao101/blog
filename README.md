@@ -59,6 +59,23 @@
 - [x] 后台禁用、启用用户和分类
 - [x] 后台导出所有的文章信息到excel
 
+## 二期增加的库
+
+### 前端
+1. highlight.js
+2. marked
+3. qs
+4. react-redux
+5. react-tinymce
+6. redux
+7. redux-thunk
+8. simplemde
+
+### 服务端
+1. mime
+2. multer
+3. xss
+
 ## 二期完成功能
 - [x] 服务端拆分成简单的model、controller分离的结构
 - [x] 整理服务端代码(一期功能简单,所有没有分开)
