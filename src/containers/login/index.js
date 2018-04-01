@@ -2,7 +2,7 @@ import React from 'react';
 import {Layout, Form, Input, Icon, Button, notification} from 'antd';
 import {connect} from 'react-redux';
 import {Params} from "../../util";
-import {loginService} from '../../service';
+import {login} from '../../action/app';
 
 const {Content} = Layout;
 const FormItem = Form.Item;
@@ -23,18 +23,7 @@ class Login extends React.PureComponent {
     }
 
     _submitDataToServer(data) {
-        loginService.login(data)
-            .subscribe(
-                () => {
-                    this.props.history.push('/admin/post');
-                },
-                (err) => {
-                    notification.error({
-                        message: '请求错误',
-                        description: err.reason
-                    });
-                },
-            );
+        this.props.login(data);
     }
 
     _getFormData() {
@@ -49,9 +38,16 @@ class Login extends React.PureComponent {
         return obj;
     }
 
-
     render() {
         const {getFieldDecorator} = this.props.form;
+        const {app, history} = this.props;
+        const {isLogin} = app;
+
+        if (isLogin) {
+            history.push('/admin/post');
+            return null;
+        }
+
         return (
             <Layout>
                 <Content>
@@ -108,6 +104,6 @@ class Login extends React.PureComponent {
 
 
 export default connect(
-    state => state,
-    {}
+    state => state.app,
+    {login}
 )(Form.create()(Login));
