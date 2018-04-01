@@ -1,9 +1,8 @@
-import {notification} from "antd";
-import Http from "../../util/Http";
-
-const actionTypes = {
+export const actionTypes = {
     LOADING: 'LOADING',
-    DETAIL: 'DETAIL',
+    GET_DETAIL: 'GET_DETAIL',
+    GET_DETAIL_DONE: 'GET_DETAIL_DONE',
+    ERROR: 'ERROR',
 };
 
 const initState = {
@@ -14,11 +13,12 @@ const initState = {
         content: '',
     },
     comments: [],
+    error: null
 };
 
 export const detailAction = (state = initState, action) => {
     switch (action.type) {
-        case actionTypes.DETAIL:
+        case actionTypes.GET_DETAIL_DONE:
             return {
                 ...state,
                 ...action.payload,
@@ -27,6 +27,11 @@ export const detailAction = (state = initState, action) => {
             return {
                 ...state,
                 loading: action.payload.loading,
+            };
+        case actionTypes.ERROR:
+            return {
+                ...state,
+                error: action.payload.error,
             };
         default:
             return state;
@@ -48,24 +53,35 @@ export const finishLoading = () => ({
 });
 
 
-export const getDetailData = data => async dispatch => {
-    await dispatch(startLoading());
-    try {
-        const res = await Http.get(`/blog/post`, data);
-        await dispatch({
-            type: actionTypes.DETAIL,
-            payload: {
-                post: res.data.post,
-                comments: res.data.comments,
-            },
-        });
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason,
-        });
+export const getDetailData = data => {
+    startLoading();
+    return {
+        type: actionTypes.GET_DETAIL,
+        payload: {
+            data,
+        },
+    };
+};
+
+export const getDetailDataDone = data => {
+    finishLoading();
+    return {
+        type: actionTypes.GET_DETAIL_DONE,
+        payload: {
+            post: data.post,
+            comments: data.comments,
+        },
+    };
+};
+
+export const  createError = (err) => {
+    console.log(err);
+    return {
+        type: actionTypes.ERROR,
+        payload: {
+            loading: false
+        }
     }
-    await dispatch(finishLoading());
 };
 
 export default detailAction;

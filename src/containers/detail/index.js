@@ -32,10 +32,6 @@ class Detail extends React.Component {
         const id = this._getId();
         if(id) {
             this.props.getDetailData({id})
-                .catch(err => notification.error({
-                    message: '请求错误',
-                    description: err.reason
-                }));
         }
     }
 
@@ -53,7 +49,7 @@ class Detail extends React.Component {
                     notification.success({
                         description: res.msg,
                     });
-                    this._updateList();
+                    this._getDetail();
                 },
                 (error) => {
                     notification.error({

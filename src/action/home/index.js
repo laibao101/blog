@@ -73,7 +73,7 @@ export const finishLoading = () => ({
 export const  createError = (err) => {
     console.log(err);
     return {
-        type: actionTypes.LOADING,
+        type: actionTypes.ERROR,
         payload: {
             loading: false
         }
