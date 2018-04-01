@@ -12,7 +12,6 @@ const initState = {
 };
 
 export const adminAction = (state = initState, action) => {
-    console.log(action, state)
     switch (action.type) {
         case actionTypes.LOADING :
             return {

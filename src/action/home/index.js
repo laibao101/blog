@@ -15,6 +15,7 @@ const initState = {
 
 
 export const homeAction = (state = initState, action) => {
+    // console.log(action)
     switch (action.type) {
         case actionTypes.LOADING:
             return {
@@ -24,33 +25,37 @@ export const homeAction = (state = initState, action) => {
         case actionTypes.HOMELIST:
             return {
                 ...state,
-                list: action.payload.list,
-                total: action.payload.total
+                // list: action.payload.list,
+                // total: action.payload.total
             };
         default:
             return state;
     }
 };
 
-export const getTableList = data => async dispatch => {
-    await dispatch(startLoading());
-    try {
-        const res = await Http.get(`/blog/posts`, data);
-        await dispatch({
-            type: actionTypes.HOMELIST,
-            payload: {
-                list: res.data.posts,
-                total: res.data.total
-            }
-        });
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
-    await dispatch(finishLoading());
-};
+// export const getTableList = data => async dispatch => {
+//     await dispatch(startLoading());
+//     try {
+//         const res = await Http.get(`/blog/posts`, data);
+//         await dispatch({
+//             type: actionTypes.HOMELIST,
+//             payload: {
+//                 list: res.data.posts,
+//                 total: res.data.total
+//             }
+//         });
+//     } catch (err) {
+//         notification.error({
+//             message: '请求错误',
+//             description: err.reason
+//         });
+//     }
+//     await dispatch(finishLoading());
+// };
+
+export const getTableList = () => ({
+    type: actionTypes.HOMELIST,
+})
 
 export const startLoading = () => ({
     type: actionTypes.LOADING,
