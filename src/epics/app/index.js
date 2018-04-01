@@ -1,7 +1,7 @@
 import 'rxjs';
 import {Observable} from 'rxjs/Observable';
 import {combineEpics} from 'redux-observable';
-import {actionTypes, loginDone, createError, logoutDone} from '../../action/app';
+import {actionTypes, loginDone, createError, logoutDone, registerDone} from '../../action/app';
 import {appService} from '../../service';
 
 const login = (action$) => {
@@ -27,7 +27,20 @@ const logout = (action$) => {
         });
 };
 
+const register = (action$) => {
+    return action$.ofType(actionTypes.REGISTER)
+        .map(action => action.payload.data)
+        .switchMap((registerInfo) => {
+            return appService.register(registerInfo)
+                .map(data => registerDone(data))
+                .catch(err => {
+                    return Observable.of(createError(err))
+                });
+        });
+};
+
 export default combineEpics(
     login,
     logout,
+    register
 );

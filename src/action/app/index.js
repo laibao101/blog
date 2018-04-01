@@ -1,8 +1,10 @@
 export const actionTypes = {
     LOGOUT: 'LOGOUT',
     LOGIN: 'LOGIN',
+    REGISTER: 'REGISTER',
     LOGIN_DONE: 'LOGIN_DONE',
     LOGOUT_DONE: 'LOGOUT_DONE',
+    REGISTER_DONE: 'REGISTER_DONE',
 };
 
 const initState = {
@@ -73,6 +75,27 @@ export const logoutDone = () => {
             name: '',
             nickname: '',
             avatar: '',
+        }
+    };
+};
+
+export const register = (data) => {
+    return {
+        type: actionTypes.REGISTER,
+        payload: {
+            data,
+        }
+    };
+};
+
+export const registerDone = (data) => {
+    return {
+        type: actionTypes.REGISTER_DONE,
+        payload: {
+            uid: data.uid,
+            name: data.name,
+            nickname: data.nickname,
+            avatar: data.avatar,
         }
     };
 };

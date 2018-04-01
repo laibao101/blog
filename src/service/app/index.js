@@ -25,7 +25,20 @@ const logout = () => {
     });
 };
 
+const register =  (data) => {
+    return new Observable(async observer => {
+        try {
+            const res = await Http.post('/api/register', data);
+            observer.next(res.data);
+            observer.complete();
+        } catch (err) {
+            observer.error(err);
+        }
+    });
+};
+
 export {
     login,
     logout,
+    register
 };
