@@ -20,10 +20,13 @@ class Home extends React.PureComponent {
     componentWillMount() {
         const page = this._getPage();
         this._updateList(page)
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason
-            }));
+            // .catch(err => {
+            //     console.log(err)
+            //     notification.error({
+            //         message: '请求错误',
+            //         description: err.reason
+            //     })
+            // });
     }
 
     /**
