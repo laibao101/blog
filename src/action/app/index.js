@@ -1,3 +1,4 @@
+import {notification} from 'antd';
 export const actionTypes = {
     LOGOUT: 'LOGOUT',
     LOGIN: 'LOGIN',
@@ -5,6 +6,7 @@ export const actionTypes = {
     LOGIN_DONE: 'LOGIN_DONE',
     LOGOUT_DONE: 'LOGOUT_DONE',
     REGISTER_DONE: 'REGISTER_DONE',
+    ERROR: 'ERROR',
 };
 
 const initState = {
@@ -101,6 +103,9 @@ export const registerDone = (data) => {
 };
 
 export const createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
     return {
         type: actionTypes.ERROR,
         payload: {

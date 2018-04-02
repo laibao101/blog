@@ -1,3 +1,5 @@
+import {notification} from "antd/lib/index";
+
 export const actionTypes = {
     LOADING: 'LOADING',
     FETCH_HOME_LIST: 'FETCH_HOME_LIST',
@@ -71,7 +73,9 @@ export const finishLoading = () => ({
     },
 });
 export const  createError = (err) => {
-    console.log(err);
+    notification.error({
+        description: err.reason,
+    });
     return {
         type: actionTypes.ERROR,
         payload: {

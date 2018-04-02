@@ -1,5 +1,5 @@
 import React from 'react';
-import {Layout, Form, Input, Icon, Button, notification} from 'antd';
+import {Layout, Form, Input, Icon, Button} from 'antd';
 import {connect} from 'react-redux';
 import {Params} from "../../util";
 import {login} from '../../action/app';
@@ -104,6 +104,6 @@ class Login extends React.PureComponent {
 
 
 export default connect(
-    state => state.app,
+    state => state,
     {login}
 )(Form.create()(Login));

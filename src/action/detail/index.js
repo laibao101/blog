@@ -1,3 +1,5 @@
+import {notification} from "antd/lib/index";
+
 export const actionTypes = {
     LOADING: 'LOADING',
     GET_DETAIL: 'GET_DETAIL',
@@ -75,7 +77,9 @@ export const getDetailDataDone = data => {
 };
 
 export const  createError = (err) => {
-    console.log(err);
+    notification.error({
+        description: err.reason,
+    });
     return {
         type: actionTypes.ERROR,
         payload: {

@@ -1,3 +1,5 @@
+import {notification} from "antd/lib/index";
+
 export const actionTypes = {
     LOADING: 'LOADING',
     GET_USER_LIST: 'GET_USER_LIST',
@@ -61,6 +63,9 @@ export const getTableListDone = (data) => {
 };
 
 export const createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
     return {
         type: actionTypes.ERROR,
         payload: {
