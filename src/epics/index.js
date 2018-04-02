@@ -5,6 +5,7 @@ import detailEpic from './detail';
 import userEpic from './user';
 import appEpic from './app';
 import adminEpic from './admin';
+import categoryEpic from './category';
 
 export default combineEpics(
     homeEpic,
@@ -12,4 +13,5 @@ export default combineEpics(
     userEpic,
     appEpic,
     adminEpic,
+    categoryEpic,
 );
