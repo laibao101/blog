@@ -1,9 +1,9 @@
 import {notification} from "antd";
-import {Http} from "../../util";
 
-const actionTypes = {
+export const actionTypes = {
     LOADING:'LOADING',
-    POSTLIST: 'POSTLIST',
+    GET_POST_LIST: 'GET_POST_LIST',
+    GET_POST_LIST_DONE: 'GET_POST_LIST_DONE',
 };
 
 const initState = {
@@ -18,7 +18,7 @@ export const adminAction = (state = initState, action) => {
                 ...state,
                 loading: action.payload.loading
             };
-        case actionTypes.POSTLIST:
+        case actionTypes.GET_POST_LIST_DONE:
             return {
                 ...state,
                 list: action.payload.list,
@@ -43,28 +43,36 @@ export const finishLoading = () => ({
     }
 });
 
-export const getTableList = (data) => async dispatch => {
-    dispatch(startLoading());
-    try {
-        const res = await Http.get('/api/admin/posts', data);
-        dispatch({
-            type:actionTypes.POSTLIST,
-            payload: {
-                list: res.data.posts,
-                total: res.data.total
-            }
-        });
-    }catch (err){
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
+export const getTableList = (data) => {
+    startLoading();
+    return {
+        type:actionTypes.GET_POST_LIST,
+        payload: {
+            data,
+        }
     }
-    dispatch(finishLoading());
+};
+export const getTableListDone = (data) => {
+    finishLoading();
+    return {
+        type:actionTypes.GET_POST_LIST_DONE,
+        payload: {
+            list: data.posts,
+            total: data.total
+        }
+    }
 };
 
-export const deletePost = (data) => async dispatch => {
-    return Http.get('/api/admin/delPost', data);
+export const createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
+    return {
+        type: actionTypes.ERROR,
+        payload: {
+            error: err,
+        }
+    }
 };
 
 export default adminAction;

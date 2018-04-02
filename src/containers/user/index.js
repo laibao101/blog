@@ -2,7 +2,7 @@ import React from "react";
 import {Table, Modal, notification} from "antd";
 import {connect} from "react-redux";
 import {getTableList} from "../../action/user";
-import {userService} from '../../service';
+import {adminService} from '../../service';
 
 class User extends React.PureComponent {
     constructor(props) {
@@ -73,13 +73,13 @@ class User extends React.PureComponent {
 
     _changeUserStatus(record) {
         if (record.status === 0) {
-            userService.enableUser({uid: record.uid})
+            adminService.enableUser({uid: record.uid})
                 .subscribe(
                     (res) => this._showOperateSuc(res),
                     (err) => this._showOperateErr(err),
                 );
         } else {
-            userService.disableUser({uid: record.uid})
+            adminService.disableUser({uid: record.uid})
                 .subscribe(
                     (res) => this._showOperateSuc(res),
                     (err) => this._showOperateErr(err),

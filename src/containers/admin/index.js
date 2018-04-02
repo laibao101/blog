@@ -2,8 +2,9 @@ import React from "react";
 import {Button, Table, notification, Divider, Modal} from "antd";
 import {connect} from 'react-redux';
 import EditorView from "./EditorView";
-import {getTableList, deletePost} from '../../action/admin';
+import {getTableList} from '../../action/admin';
 import {QueryString, Time} from "../../util";
+import {deletePost} from '../../service/admin'
 
 class Admin extends React.PureComponent {
     constructor(props) {
@@ -135,42 +136,30 @@ class Admin extends React.PureComponent {
             title: '删除',
             content: '确定删除吗?',
             onOk: async () => {
-                try {
-                    const res = await this.props.deletePost({id});
-                    if (res.code === 0) {
-                        await this._updateList();
-                    }
-                } catch (err) {
-                    notification.error({
-                        message: '请求错误',
-                        description: err.reason
-                    });
-                }
+                deletePost({id})
+                    .subscribe(
+                        (res) => {
+                            notification.success({
+                                description: res.msg,
+                            });
+                            this._updateList();
+                        },
+                        (error) => {
+                            notification.error({
+                                description: error.reason,
+                            });
+                        },
+                    );
             },
         });
     }
 
     _preview(id) {
-        window.open(`#/detail/${id}`)
+        window.open(`#/detail/${id}`);
     }
 
     _updateList(nextPage = this._getPage()) {
-        this._getList(nextPage)
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason
-            }));
-    }
-
-    async _getList(nextPage) {
-        try {
-            await this.props.getTableList({page: nextPage, limit: this.limit});
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+        this.props.getTableList({page: nextPage, limit: this.limit});
     }
 
     _changeEditorStatus(status, sign) {
@@ -183,15 +172,15 @@ class Admin extends React.PureComponent {
         });
     }
 
-    async _paginateChange(nextPage) {
+    _paginateChange(nextPage) {
         const page = this._getPage();
         // 如果点击的是相同页，不做操作
         if (nextPage === page) {
             return;
         }
         // 翻页后刷新列表
-        await this._updateList(nextPage);
-        await this.props.history.push({
+        this._updateList(nextPage);
+        this.props.history.push({
             pathname: '/admin/post',
             search: `?page=${nextPage}`
         });
@@ -204,6 +193,9 @@ class Admin extends React.PureComponent {
     render() {
         const {list = [], total = 0, loading = false} = this.props;
         const page = this._getPage();
+        if (list.length === 0) {
+            this._paginateChange( page > 1 ? page - 1 : 1);
+        }
         const pagination = {
             pageSize: 5,
             showQuickJumper: true,
@@ -247,5 +239,5 @@ class Admin extends React.PureComponent {
 
 export default connect(
     state => state.admin.admin,
-    {getTableList, deletePost}
+    {getTableList}
 )(Admin)
