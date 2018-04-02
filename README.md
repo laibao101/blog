@@ -100,6 +100,7 @@
 ## 二期迭代的小版本完成功能
 - [x] 将所有的redux-thunk迁移到redux-observable
 - [x] 使用rxjs流式编程
+- [x] 前端增加service层，所有服务全部由service层发起
 
 ## 三期计划
 - [ ] 增加爬虫爬取文章，管理系统一键爬取文章
