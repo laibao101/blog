@@ -25,8 +25,59 @@ const deletePost = (data) => {
     });
 };
 
+const getCategories = () => {
+    return new Observable(async observer => {
+        try {
+            const res = await Http.get('/api/admin/categories');
+            observer.next(res.data);
+            observer.complete();
+        } catch (err) {
+            observer.error(err);
+        }
+    });
+};
+
+const getPost = (data) => {
+    return new Observable(async observer => {
+        try {
+            const res = await Http.get('/api/admin/post', data);
+            observer.next(res.data.post);
+            observer.complete();
+        } catch (err) {
+            observer.error(err);
+        }
+    });
+};
+
+const addPost = (data) => {
+    return new Observable(async observer => {
+        try {
+            const res = await Http.post('/api/admin/post', data);
+            observer.next(res);
+            observer.complete();
+        } catch (err) {
+            observer.error(err);
+        }
+    });
+};
+
+const editPost = (data) => {
+    return new Observable(async observer => {
+        try {
+            const res = await Http.post('/api/admin/editPost', data);
+            observer.next(res);
+            observer.complete();
+        } catch (err) {
+            observer.error(err);
+        }
+    });
+};
 
 export {
     getListData,
     deletePost,
+    getCategories,
+    getPost,
+    addPost,
+    editPost,
 };

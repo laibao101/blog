@@ -1,67 +1,38 @@
-import {Http} from "../../util";
-import {notification} from "antd";
-
-const actionTypes = {
-    OPTIONS: 'OPTIONS',
-    POSTDATA: 'POSTDATA'
+export const actionTypes = {
+    GET_OPTIONS: 'GET_OPTIONS',
+    GET_OPTIONS_DONE: 'GET_OPTIONS_DONE',
 };
 
 const initState = {
     options: [],
-    post: {}
 };
 
 export const editorAction = (state = initState, action) => {
     switch (action.type) {
-        case actionTypes.OPTIONS:
+        case actionTypes.GET_OPTIONS_DONE:
             return {
                 ...state,
                 options: action.payload.options
-            };
-        case actionTypes.POSTDATA:
-            return {
-                ...state,
-                post: action.payload.post
             };
         default:
             return state;
     }
 };
 
-export const getCategories = () => async dispatch => {
-    try {
-        const res = await Http.get('/api/admin/categories');
-        dispatch({
-            type: actionTypes.OPTIONS,
-            payload: {
-                options: res.data.categories
-            }
-        });
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
+export const getCategories = () => {
+    return {
+        type: actionTypes.GET_OPTIONS,
+        payload: {},
+    };
 };
 
-export const getPostData = (data) => async () => {
-    try {
-        return await Http.get('/api/admin/post', data);
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
-};
-
-export const addPost = (data) => () => {
-    return Http.post('/api/admin/post', data);
-};
-
-export const editPost = (data) => () => {
-    return Http.post('/api/admin/editPost', data);
+export const getCategoriesDone = (data) => {
+    return {
+        type: actionTypes.GET_OPTIONS_DONE,
+        payload: {
+            options: data.categories,
+        },
+    };
 };
 
 export default editorAction;
