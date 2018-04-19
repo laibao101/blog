@@ -97,6 +97,33 @@
 1. redux-observable
 2. rxjs
 
+### 服务端
+无
+
+## 二期迭代的小版本完成功能
+- [x] 将所有的redux-thunk迁移到redux-observable
+- [x] 使用rxjs流式编程
+- [x] 前端增加service层，所有服务全部由service层发起
+
+
+## 三期迭代前的小版本增加的库
+
+### 前端
+无
+
+### 服务端
+1. typescript
+2. koa
+3. koa-bodyparser
+4. koa-morgan
+5. koa-router
+6. koa-jwt
+7. jsonwebtoken
+
+## 三期迭代前的小版本完成的功能
+- [x] 服务端由express迁移到koa
+- [x] 服务端使用typescript开发
+- [x] 服务端鉴权方式由passport迁移到jwt
 ## 二期迭代的小版本完成功能
 - [x] 将所有的redux-thunk迁移到redux-observable
 - [x] 使用rxjs流式编程
