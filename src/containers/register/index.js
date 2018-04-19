@@ -2,7 +2,7 @@ import React from 'react';
 import {Layout, Form, Input, Icon, Button, notification, Steps, Card, message, Upload, Modal} from 'antd';
 import {connect} from 'react-redux';
 import {Params} from "../../util";
-import {register} from '../../action/register'
+import {register} from '../../action/app'
 
 const {Content} = Layout;
 const FormItem = Form.Item;
@@ -28,27 +28,11 @@ class Register extends React.PureComponent {
         if (!data) {
             return;
         }
-        this._submitDataToServer(data)
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason
-            }));
+        this._submitDataToServer(data);
     }
 
-    async _submitDataToServer(data) {
-        try {
-            const res = await this.props.register(data);
-            if (res.code === 0) {
-                this.setState({
-                    step: 1
-                });
-            }
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _submitDataToServer(data) {
+        this.props.register(data);
     }
 
     _getFormData() {

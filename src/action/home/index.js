@@ -1,16 +1,17 @@
-import {notification} from 'antd';
-import Http from "../../util/Http";
+import {notification} from "antd/lib/index";
 
 export const actionTypes = {
     LOADING: 'LOADING',
-    HOMELIST: 'HOMELIST',
-    LiKE: 'LiKE',
+    FETCH_HOME_LIST: 'FETCH_HOME_LIST',
+    FETCH_HOME_LIST_DONE: 'FETCH_HOME_LIST_DONE',
+    ERROR: 'ERROR',
 };
 
 const initState = {
     list: [],
     total: 0,
-    loading: false
+    loading: false,
+    error: null,
 };
 
 
@@ -21,57 +22,66 @@ export const homeAction = (state = initState, action) => {
                 ...state,
                 loading: action.payload.loading
             };
-        case actionTypes.HOMELIST:
+        case actionTypes.FETCH_HOME_LIST_DONE:
             return {
                 ...state,
                 list: action.payload.list,
                 total: action.payload.total
+            };
+        case actionTypes.ERROR:
+            return {
+                ...state,
+                error: action.payload.error,
             };
         default:
             return state;
     }
 };
 
-export const getTableList = data => async dispatch => {
-    await dispatch(startLoading());
-    try {
-        const res = await Http.get(`/blog/posts`, data);
-        await dispatch({
-            type: actionTypes.HOMELIST,
-            payload: {
-                list: res.data.posts,
-                total: res.data.total
-            }
-        });
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
-    await dispatch(finishLoading());
+export const getTableList = (data) => {
+    startLoading();
+    return {
+        type: actionTypes.FETCH_HOME_LIST,
+        payload: {
+            data,
+        }
+    };
+};
+
+export const getTableListDone = (data) => {
+    finishLoading();
+    return {
+        type: actionTypes.FETCH_HOME_LIST_DONE,
+        payload: {
+            list: data.posts,
+            total: data.total
+        },
+    };
 };
 
 export const startLoading = () => ({
     type: actionTypes.LOADING,
     payload: {
         loading: true
-    }
+    },
 });
 
 export const finishLoading = () => ({
     type: actionTypes.LOADING,
     payload: {
         loading: false
-    }
+    },
 });
-
-export const like = data => async () => {
-    return await Http.get('/blog/like', data);
-};
-
-export const comment = data => async () => {
-    return await Http.post('/blog/comment', data);
+export const  createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
+    return {
+        type: actionTypes.ERROR,
+        payload: {
+            loading: false
+        }
+    }
 };
 
 export default homeAction;

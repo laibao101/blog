@@ -6,7 +6,7 @@ import CommentsView from "./CommentsView";
 import ReplyView from "./ReplyView";
 import {getDetailData} from "../../action/detail";
 import {Time, Marked} from "../../util";
-import {comment} from "../../action/home";
+import {homeService} from '../../service';
 
 class Detail extends React.Component {
     constructor() {
@@ -32,10 +32,6 @@ class Detail extends React.Component {
         const id = this._getId();
         if(id) {
             this.props.getDetailData({id})
-                .catch(err => notification.error({
-                    message: '请求错误',
-                    description: err.reason
-                }));
         }
     }
 
@@ -44,21 +40,23 @@ class Detail extends React.Component {
     }
 
     _handleSubmit(comment) {
-        this.props.comment({
+        homeService.comment({
             comment,
             id: this._getId(),
         })
-            .then(async res => {
-                notification.success({
-                    message: '评论成功',
-                    description: res.msg,
-                });
-                this._getDetail();
-            })
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason,
-            }));
+            .subscribe(
+                (res) => {
+                    notification.success({
+                        description: res.msg,
+                    });
+                    this._getDetail();
+                },
+                (error) => {
+                    notification.error({
+                        description: error.reason,
+                    });
+                },
+            );
     }
 
     render() {
@@ -105,5 +103,5 @@ class Detail extends React.Component {
 
 export default connect(
     state => state.detail,
-    {getDetailData, comment}
+    {getDetailData}
 )(Detail)

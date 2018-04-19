@@ -1,9 +1,8 @@
 import React from 'react';
-import {Layout, Form, Input, Icon, Button, notification} from 'antd';
+import {Layout, Form, Input, Icon, Button} from 'antd';
 import {connect} from 'react-redux';
 import {Params} from "../../util";
-// import {login} from '../../action/login'
-import {login} from '../../action/app'
+import {login} from '../../action/app';
 
 const {Content} = Layout;
 const FormItem = Form.Item;
@@ -20,25 +19,11 @@ class Login extends React.PureComponent {
         if (!data) {
             return;
         }
-        this._submitDataToServer(data)
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason
-            }));
+        this._submitDataToServer(data);
     }
 
-    async _submitDataToServer(data) {
-        try {
-            const res = await this.props.login(data);
-            if (res.code === 0) {
-                this.props.history.push('/admin/post');
-            }
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _submitDataToServer(data) {
+        this.props.login(data);
     }
 
     _getFormData() {
@@ -53,9 +38,16 @@ class Login extends React.PureComponent {
         return obj;
     }
 
-
     render() {
         const {getFieldDecorator} = this.props.form;
+        const {app, history} = this.props;
+        const {isLogin} = app;
+
+        if (isLogin) {
+            history.push('/admin/post');
+            return null;
+        }
+
         return (
             <Layout>
                 <Content>
@@ -112,6 +104,6 @@ class Login extends React.PureComponent {
 
 
 export default connect(
-    state => state.login,
+    state => state,
     {login}
 )(Form.create()(Login));

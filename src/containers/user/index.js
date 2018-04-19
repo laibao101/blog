@@ -1,7 +1,8 @@
 import React from "react";
 import {Table, Modal, notification} from "antd";
 import {connect} from "react-redux";
-import {disableUser, enableUser, getTableList} from "../../action/user";
+import {getTableList} from "../../action/user";
+import {adminService} from '../../service';
 
 class User extends React.PureComponent {
     constructor(props) {
@@ -48,45 +49,41 @@ class User extends React.PureComponent {
             title: `${record.status === 0 ? '启用' : '禁用'}`,
             content: `确定${record.status === 0 ? '启用' : '禁用'}吗?`,
             onOk: () => {
-                this._changeUserStatus(record)
-                    .catch(err => notification.error({
-                        message: '请求错误',
-                        description: err.reason
-                    }));
+                this._changeUserStatus(record);
             },
         });
     }
 
     _updateList() {
-        try {
-            this.props.getTableList();
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+        this.props.getTableList();
     }
 
+    _showOperateSuc(res) {
+        notification.success({
+            description: res.msg
+        });
+        this._updateList();
+    }
 
-    async _changeUserStatus(record) {
-        try {
-            let res = null;
-            if (record.status === 0) {
-                res = await this.props.enableUser({uid: record.uid});
-            } else {
-                res = await this.props.disableUser({uid: record.uid});
-            }
-            notification.success({
-                message: '操作结果',
-                description: res.msg
-            });
-            this._updateList();
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
+    _showOperateErr(err) {
+        notification.error({
+            description: err.reason
+        });
+    }
+
+    _changeUserStatus(record) {
+        if (record.status === 0) {
+            adminService.enableUser({uid: record.uid})
+                .subscribe(
+                    (res) => this._showOperateSuc(res),
+                    (err) => this._showOperateErr(err),
+                );
+        } else {
+            adminService.disableUser({uid: record.uid})
+                .subscribe(
+                    (res) => this._showOperateSuc(res),
+                    (err) => this._showOperateErr(err),
+                );
         }
     }
 
@@ -113,5 +110,5 @@ class User extends React.PureComponent {
 
 export default connect(
     state => state.user,
-    {getTableList, enableUser, disableUser}
+    {getTableList}
 )(User);

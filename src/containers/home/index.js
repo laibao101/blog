@@ -2,9 +2,10 @@ import React from "react";
 import {Card, Icon, List, Pagination, notification, Spin, Tooltip} from "antd";
 import {connect} from 'react-redux';
 import {Link, withRouter} from "react-router-dom";
-import {comment, getTableList, like} from '../../action/home';
+import {getTableList} from '../../action/home';
 import {Time, QueryString} from "../../util";
 import CommentView from "./CommentView";
+import {homeService} from '../../service';
 
 class Home extends React.PureComponent {
     constructor(props) {
@@ -19,11 +20,7 @@ class Home extends React.PureComponent {
 
     componentWillMount() {
         const page = this._getPage();
-        this._updateList(page)
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason
-            }));
+        this._updateList(page);
     }
 
     /**
@@ -31,15 +28,15 @@ class Home extends React.PureComponent {
      * @param nextPage 下一页页数
      * @private
      */
-    async _paginateChange(nextPage) {
+    _paginateChange(nextPage) {
         const page = this._getPage();
         // 如果点击的是相同页，不做操作
         if (nextPage === page) {
             return;
         }
         // 翻页后刷新列表
-        await this._updateList(nextPage);
-        await this.props.history.push({
+        this._updateList(nextPage);
+        this.props.history.push({
             pathname: '/',
             search: `?page=${nextPage}`
         });
@@ -64,22 +61,21 @@ class Home extends React.PureComponent {
      * @returns {Promise<void>}
      * @private
      */
-    async _addLike(id) {
-        try {
-            const res = await this.props.like({id});
-            if (res.code === 0) {
-                notification.success({
-                    message: '点赞成功',
-                    description: res.msg
-                });
-                await this._updateList();
-            }
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _addLike(id) {
+        homeService.like({id})
+            .subscribe(
+                (res) => {
+                    notification.success({
+                        description: res.msg,
+                    });
+                    this._updateList();
+                },
+                (error) => {
+                    notification.error({
+                        description: error.reason,
+                    });
+                },
+            );
     }
 
     /**
@@ -87,8 +83,8 @@ class Home extends React.PureComponent {
      * @param page 当前页数
      * @private
      */
-    async _updateList(page = this._getPage()) {
-        await this.props.getTableList({
+    _updateList(page = this._getPage()) {
+        this.props.getTableList({
             page,
             limit: this.limit
         });
@@ -104,21 +100,23 @@ class Home extends React.PureComponent {
     }
 
     _submitComment(comment, id) {
-        this.props.comment({
+        homeService.comment({
             comment,
             id,
         })
-            .then(async res => {
-                notification.success({
-                    message: '评论成功',
-                    description: res.msg,
-                });
-                await this._updateList();
-            })
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason,
-            }));
+            .subscribe(
+                (res) => {
+                    notification.success({
+                        description: res.msg,
+                    });
+                    this._updateList();
+                },
+                (error) => {
+                    notification.error({
+                        description: error.reason,
+                    });
+                },
+            );
     }
 
     render() {
@@ -213,5 +211,5 @@ class Home extends React.PureComponent {
 
 export default connect(
     state => state.home,
-    {getTableList, like, comment}
+    {getTableList}
 )(withRouter(Home));

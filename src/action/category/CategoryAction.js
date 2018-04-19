@@ -1,9 +1,9 @@
-import Http from "../../util/Http";
 import {notification} from "antd";
 
-const actionTypes = {
+export const actionTypes = {
     LOADING: 'LOADING',
-    CATEGORIES: 'CATEGORIES'
+    GET_CATEGORIES: 'GET_CATEGORIES',
+    GET_CATEGORIES_DONE: 'GET_CATEGORIES_DONE',
 };
 
 const initState = {
@@ -19,7 +19,7 @@ export const categoryAction = (state = initState, action) => {
                 ...state,
                 loading: action.payload.loading
             };
-        case actionTypes.CATEGORIES:
+        case actionTypes.GET_CATEGORIES_DONE:
             return {
                 ...state,
                 list: action.payload.list,
@@ -30,25 +30,25 @@ export const categoryAction = (state = initState, action) => {
     }
 };
 
+export const getCategories = (data) => {
+    startLoading();
+    return {
+        type: actionTypes.GET_CATEGORIES,
+        payload: {
+            data,
+        }
+    };
+};
 
-export const getCategories = (data) => async dispatch => {
-    await dispatch(startLoading());
-    try {
-        const res = await  Http.get('/api/admin/categories', data);
-        await dispatch({
-            type: actionTypes.CATEGORIES,
-            payload: {
-                list: res.data.categories,
-                total: res.data.total
-            }
-        });
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
-    await dispatch(finishLoading());
+export const getCategoriesDone = (data) => {
+    finishLoading();
+    return {
+        type: actionTypes.GET_CATEGORIES_DONE,
+        payload: {
+            list: data.categories,
+            total: data.total,
+        },
+    };
 };
 
 export const startLoading = () => ({
@@ -65,13 +65,16 @@ export const finishLoading = () => ({
     }
 });
 
-export const enableCategory = (data) => () => {
-    return Http.get('/api/admin/enableCategory', data);
+export const createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
+    return {
+        type: actionTypes.ERROR,
+        payload: {
+            loading: false
+        }
+    }
 };
-
-export const disableCategory = (data) => () => {
-    return Http.get('/api/admin/disableCategory', data);
-};
-
 
 export default categoryAction;

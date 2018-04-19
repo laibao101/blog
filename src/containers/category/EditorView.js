@@ -3,7 +3,7 @@ import {Modal, Form, Input} from "antd";
 import {notification} from "antd/lib/index";
 import {Params} from "../../util";
 import {connect} from "react-redux";
-import {addCategory, editCategory} from "../../action/category/EditorAction";
+import {addCategory, editCategory} from "../../service/category";
 
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -32,11 +32,7 @@ class EditorView extends React.Component {
         const data = this._getFormData();
 
         if (data) {
-            this._submitFormData(data)
-                .catch(err => notification.error({
-                    message: '请求错误',
-                    description: err.reason
-                }));
+            this._submitFormData(data);
         }
     }
 
@@ -59,26 +55,42 @@ class EditorView extends React.Component {
         return obj;
     }
 
-    async _submitFormData(data) {
-        try {
-            let res = null;
-            if (this.props.mode === 'add') {
-                res = await this.props.addCategory(data);
-            } else {
-                data.id = this.props.id;
-                res = await this.props.editCategory(data);
-            }
-            notification.success({
-                message: '提交成功',
-                description: res.msg
-            });
-            this.props.onOk(true);
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
+     _submitFormData(data) {
+        if (this.props.mode === 'add') {
+            addCategory(data)
+                .subscribe(
+                    (res) => {
+                        this._showSuccess(res);
+                    },
+                    (error) => {
+                        this._showError(error);
+                    },
+                );
+        } else {
+            data.id = this.props.id;
+            editCategory(data)
+                .subscribe(
+                    (res) => {
+                        this._showSuccess(res);
+                    },
+                    (error) => {
+                        this._showError(error);
+                    },
+                );
         }
+    }
+
+    _showError(err) {
+        notification.error({
+            description: err.reason
+        });
+    }
+
+    _showSuccess(res) {
+        this.props.onOk(true);
+        notification.success({
+            description: res.msg,
+        });
     }
 
     render() {
@@ -113,6 +125,6 @@ class EditorView extends React.Component {
 }
 
 export default connect(
-    state => state.category.editor,
-    {addCategory, editCategory}
+    state => state.category,
+    {}
 )(Form.create()(EditorView));

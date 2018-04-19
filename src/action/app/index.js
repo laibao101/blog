@@ -1,9 +1,12 @@
-import Http from "../../util/Http";
-import {notification} from "antd/lib/index";
-
-const actionTypes = {
+import {notification} from 'antd';
+export const actionTypes = {
     LOGOUT: 'LOGOUT',
     LOGIN: 'LOGIN',
+    REGISTER: 'REGISTER',
+    LOGIN_DONE: 'LOGIN_DONE',
+    LOGOUT_DONE: 'LOGOUT_DONE',
+    REGISTER_DONE: 'REGISTER_DONE',
+    ERROR: 'ERROR',
 };
 
 const initState = {
@@ -16,8 +19,8 @@ const initState = {
 };
 
 export const appAction = (state = initState, action) => {
-    switch (action.type){
-        case actionTypes.LOGOUT:
+    switch (action.type) {
+        case actionTypes.LOGOUT_DONE:
             return {
                 ...state,
                 userInfo: {
@@ -25,7 +28,7 @@ export const appAction = (state = initState, action) => {
                 },
                 isLogin: false,
             };
-        case actionTypes.LOGIN:
+        case actionTypes.LOGIN_DONE:
             return {
                 ...state,
                 userInfo: {
@@ -38,44 +41,76 @@ export const appAction = (state = initState, action) => {
     }
 };
 
-
-export const logout = () => async dispatch => {
-    try {
-        await Http.get('/api/logout');
-        dispatch({
-            type: actionTypes.LOGOUT,
-            payload: {
-                uid: -1,
-                name: '',
-                nickname: '',
-            }
-        });
-    }catch (err){
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
+export const logout = () => {
+    return {
+        type: actionTypes.LOGOUT,
+        payload: {}
+    };
 };
 
-export const login = (data) => async dispatch => {
-    try{
-        const res = await Http.post('/api/login', data);
-        dispatch({
-            type: actionTypes.LOGIN,
-            payload: {
-                uid: res.data.uid,
-                name: res.data.name,
-                nickname: res.data.nickname,
-                avatar: res.data.avatar,
-            }
-        });
-        return res;
-    }catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
+export const login = (data) => {
+    return {
+        type: actionTypes.LOGIN,
+        payload: {
+            data,
+        },
+    };
+};
+
+export const loginDone = (data) => {
+    return {
+        type: actionTypes.LOGIN_DONE,
+        payload: {
+            uid: data.uid,
+            name: data.name,
+            nickname: data.nickname,
+            avatar: data.avatar,
+        }
+    };
+};
+
+export const logoutDone = () => {
+    return {
+        type: actionTypes.LOGOUT_DONE,
+        payload: {
+            uid: '',
+            name: '',
+            nickname: '',
+            avatar: '',
+        }
+    };
+};
+
+export const register = (data) => {
+    return {
+        type: actionTypes.REGISTER,
+        payload: {
+            data,
+        }
+    };
+};
+
+export const registerDone = (data) => {
+    return {
+        type: actionTypes.REGISTER_DONE,
+        payload: {
+            uid: data.uid,
+            name: data.name,
+            nickname: data.nickname,
+            avatar: data.avatar,
+        }
+    };
+};
+
+export const createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
+    return {
+        type: actionTypes.ERROR,
+        payload: {
+            error: err,
+        }
     }
 };
 

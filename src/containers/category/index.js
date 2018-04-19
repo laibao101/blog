@@ -2,8 +2,9 @@ import React from "react";
 import {Table, Modal, Button, notification} from "antd";
 import {connect} from "react-redux";
 import EditorView from "./EditorView";
-import {disableCategory, enableCategory, getCategories} from "../../action/category";
+import {getCategories} from "../../action/category";
 import {QueryString} from "../../util";
+import {enableCategory, disableCategory} from '../../service/category';
 
 class Category extends React.PureComponent {
     constructor(props) {
@@ -48,60 +49,65 @@ class Category extends React.PureComponent {
             title: `${record.status === 0 ? '启用' : '禁用'}`,
             content: `确定${record.status === 0 ? '启用' : '禁用'}吗?`,
             onOk: async () => {
-                this._changeCategoryStatus(record)
-                    .catch(err => notification.error({
-                        message: '请求错误',
-                        description: err.reason
-                    }));
+                this._changeCategoryStatus(record);
             },
         });
     }
 
-    async _changeCategoryStatus(record) {
-        try {
-            let res = null;
-            if (record.status === 0) {
-                res = await this.props.enableCategory({id: record.id});
-            } else {
-                res = await this.props.disableCategory({id: record.id});
-            }
-            notification.success({
-                message: '操作结果',
-                description: res.msg
-            });
-            this._updateList();
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
+    _showError(err) {
+        notification.error({
+            description: err.reason
+        });
+    }
+
+    _showSuccess(res) {
+        this._updateList();
+        notification.success({
+            description: res.msg,
+        });
+    }
+
+    _changeCategoryStatus(record) {
+        if (record.status === 0) {
+            enableCategory({id: record.id})
+                .subscribe(
+                    (res) => {
+                        this._showSuccess(res);
+                    },
+                    (error) => {
+                        this._showError(error);
+                    },
+                );
+        } else {
+            disableCategory({id: record.id})
+                .subscribe(
+                    (res) => {
+                        this._showSuccess(res);
+                    },
+                    (error) => {
+                        this._showError(error);
+                    },
+                );
         }
     }
 
     _updateList(nextPage = this._getPage()) {
-        try {
-            this.props.getCategories({page: nextPage, limit: this.limit});
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+        this.props.getCategories({page: nextPage, limit: this.limit});
     }
 
     _genOperations(text, record) {
         return <a onClick={() => this._changeStatus(record)}>{record.status === 0 ? '启用' : '禁用'}</a>;
     }
 
-    async _paginateChange(nextPage) {
+    _paginateChange(nextPage) {
         const page = this._getPage();
         // 如果点击的是相同页，不做操作
         if (nextPage === page) {
             return;
         }
         // 翻页后刷新列表
-        await this._updateList(nextPage);
-        await this.props.history.push({
+        this._updateList(nextPage);
+        this.props.history.push({
             pathname: '/admin/category',
             search: `?page=${nextPage}`
         });
@@ -167,5 +173,5 @@ class Category extends React.PureComponent {
 
 export default connect(
     state => state.category.category,
-    {getCategories, enableCategory, disableCategory}
+    {getCategories}
 )(Category)

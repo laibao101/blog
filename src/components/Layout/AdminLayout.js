@@ -3,8 +3,9 @@ import {Layout, Menu, Icon, LocaleProvider, Breadcrumb, Dropdown, Badge, Avatar}
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import GlobalFooter from "../GlobalFooter";
 import {connect} from "react-redux";
-import {logout} from "../../action/app";
+import {logout} from "../../service/app";
 import userLogo from '../../static/img/logo.png'
+import {notification} from "antd/lib/index";
 const {Header, Sider, Content} = Layout;
 
 class AdminLayout extends React.PureComponent {
@@ -31,10 +32,17 @@ class AdminLayout extends React.PureComponent {
 
     _handleLogout = ({key}) => {
         if (key === 'logout') {
-            this.props.logout()
-                .then(() => {
-                    this._checkLogin();
-                });
+            logout()
+                .subscribe(
+                    () => {
+                        this.props.history.push('/');
+                    },
+                    (err) => {
+                        notification.error({
+                            description: err.reason
+                        });
+                    },
+                );
         }
     };
 
@@ -148,5 +156,5 @@ class AdminLayout extends React.PureComponent {
 
 export default connect(
     state => state.app,
-    {logout}
+    {}
 )(AdminLayout);

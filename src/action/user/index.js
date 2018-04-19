@@ -1,9 +1,10 @@
-import {notification} from 'antd';
-import Http from "../../util/Http";
+import {notification} from "antd/lib/index";
 
 export const actionTypes = {
     LOADING: 'LOADING',
-    USERLIST: 'USERLIST',
+    GET_USER_LIST: 'GET_USER_LIST',
+    GET_USER_LIST_DONE: 'GET_USER_LIST_DONE',
+    ERROR: 'ERROR',
 };
 
 const initState = {
@@ -19,7 +20,7 @@ export const userAction = (state = initState, action) => {
                 ...state,
                 loading: action.payload.loading
             };
-        case actionTypes.USERLIST:
+        case actionTypes.GET_USER_LIST_DONE:
             return {
                 ...state,
                 list: action.payload.list,
@@ -29,23 +30,12 @@ export const userAction = (state = initState, action) => {
     }
 };
 
-export const getTableList = data => async dispatch => {
-    await dispatch(startLoading());
-    try {
-        const res = await Http.get('/api/admin/users', data);
-        await dispatch({
-            type: actionTypes.USERLIST,
-            payload: {
-                list: res.data,
-            }
-        });
-    } catch (err) {
-        notification.error({
-            message: '请求错误',
-            description: err.reason
-        });
-    }
-    await dispatch(finishLoading());
+export const getTableList = () => {
+    startLoading();
+    return {
+        type: actionTypes.GET_USER_LIST,
+        payload: {},
+    };
 };
 
 export const startLoading = () => ({
@@ -62,12 +52,26 @@ export const finishLoading = () => ({
     }
 });
 
-export const enableUser = (data) => () => {
-    return Http.get('/api/admin/enableUser', data);
+export const getTableListDone = (data) => {
+    finishLoading();
+    return {
+        type: actionTypes.GET_USER_LIST_DONE,
+        payload: {
+            list: data,
+        },
+    };
 };
 
-export const disableUser = (data) => () => {
-    return Http.get('/api/admin/disableUser', data);
+export const createError = (err) => {
+    notification.error({
+        description: err.reason,
+    });
+    return {
+        type: actionTypes.ERROR,
+        payload: {
+            error: err,
+        },
+    };
 };
 
 export default userAction;

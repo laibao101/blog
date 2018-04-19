@@ -1,10 +1,10 @@
-import {createStore, compose, applyMiddleware} from 'redux';
-import thunk from 'redux-thunk';
-import reducers from './reducers';
+import {createStore, applyMiddleware} from 'redux';
+import { createEpicMiddleware } from 'redux-observable';
+import rootReducer from './rootReducer';
+import rootEpic from './rootEpic';
 
-const store = createStore(reducers, compose(
-    applyMiddleware(thunk),
-    window.devToolsExtension ? window.devToolsExtension() : f => f
-));
+const epicMiddleware = createEpicMiddleware(rootEpic);
+const store = createStore(rootReducer,  applyMiddleware(epicMiddleware));
+
 
 export default store;

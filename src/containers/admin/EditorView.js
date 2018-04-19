@@ -1,7 +1,8 @@
 import React from "react";
 import {Form, Input, Modal, Select, notification, Button, Popconfirm} from "antd";
 import {connect} from 'react-redux';
-import {getCategories, getPostData, addPost, editPost} from '../../action/admin'
+import {getCategories} from '../../action/admin';
+import {getPost, addPost, editPost} from '../../service/admin';
 import {Params} from "../../util";
 import ModalEditor from "../../components/Mceditor/ModalEditor";
 import ModalMde from "../../components/SimpleMde/ModalMde";
@@ -36,31 +37,23 @@ class EditorView extends React.PureComponent {
     }
 
     componentWillMount() {
-        this.props.getCategories()
-            .catch(err => notification.error({
-                message: '请求错误',
-                description: err.reason
-            }));
+        this.props.getCategories();
         const {mode, id} = this.props;
         if (mode === 'edit') {
-            this._setForm(id)
-                .catch(err => notification.error({
-                    message: '请求错误',
-                    description: err.reason
-                }));
+            this._setForm(id);
         }
     }
 
-    async _setForm(id) {
-        try {
-            const data = await this.props.getPostData({id});
-            this._setFormData(data.data.post);
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _setForm(id) {
+        getPost({id})
+            .subscribe(
+                (data) => {
+                    this._setFormData(data);
+                },
+                (error) => {
+                    this._showError(error);
+                },
+            );
     }
 
     _setFormData(data) {
@@ -80,57 +73,41 @@ class EditorView extends React.PureComponent {
         return arr.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
     }
 
-    async _onOk() {
+    _onOk() {
         const data = this._getFormData();
         const {mode, id} = this.props;
         if (data) {
             if (mode === 'add') {
-                this._addPost(data)
-                    .catch(err => notification.error({
-                        message: '请求错误',
-                        description: err.reason
-                    }));
+                this._addPost(data);
             } else {
                 data.id = id;
-                this._editPost(data)
-                    .catch(err => notification.error({
-                        message: '请求错误',
-                        description: err.reason
-                    }));
+                this._editPost(data);
             }
         }
     }
 
-    async _editPost(data) {
-        try {
-            const res = await this.props.editPost(data);
-            this.props.onOk(true);
-            notification.success({
-                message: '提交成功',
-                description: res.msg
-            });
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _editPost(data) {
+        editPost(data)
+            .subscribe(
+                (res) => {
+                    this._showSuccess(res);
+                },
+                (error) => {
+                    this._showError(error);
+                },
+            );
     }
 
-    async _addPost(data) {
-        try {
-            const res = await this.props.addPost(data);
-            this.props.onOk(true);
-            notification.success({
-                message: '提交成功',
-                description: res.msg
-            });
-        } catch (err) {
-            notification.error({
-                message: '请求错误',
-                description: err.reason
-            });
-        }
+    _addPost(data) {
+        addPost(data)
+            .subscribe(
+                (res) => {
+                    this._showSuccess(res);
+                },
+                (error) => {
+                    this._showError(error);
+                },
+            );
     }
 
     _getFormData() {
@@ -146,6 +123,19 @@ class EditorView extends React.PureComponent {
             obj = Params.serializeSearchData(values);
         });
         return obj;
+    }
+
+    _showError(err) {
+        notification.error({
+            description: err.reason
+        });
+    }
+
+    _showSuccess(res) {
+        this.props.onOk(true);
+        notification.success({
+            description: res.msg,
+        });
     }
 
     _onClose() {
@@ -304,5 +294,5 @@ class EditorView extends React.PureComponent {
 
 export default connect(
     state => state.admin.editor,
-    {getCategories, getPostData, addPost, editPost}
+    {getCategories}
 )(Form.create()(EditorView));

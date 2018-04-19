@@ -320,7 +320,7 @@ router.post('/category', async (req, res, next) => {
 
 router.get('/exportExcel', async (req, res, next) => {
     try {
-        const posts = await Post.getPosts();
+        const posts = await Post.getAllPosts();
 
         const conf = {};
         conf.cols = [{
@@ -458,6 +458,6 @@ const checkItem = (field, length, fileName) => {
 
 module.exports = {
     init:function (app) {
-        app.use('/api/admin', requireLogin, router);
+        app.use('/api/admin', router);
     }
 };
