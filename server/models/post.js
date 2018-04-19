@@ -42,6 +42,12 @@ const likePost = (id) => {
     return connect.query(likePostSql, [id]);
 };
 
+const getAllPostsSql = `SELECT posts.*, user.uid, user.uname, user.nickname,category.name as categoryName, category.categoryId  from posts INNER JOIN user on posts.author = user.uid INNER JOIN category ON posts.category = category.id where posts.status = 1`;
+const getAllPosts = () => {
+    const connect = getConnection();
+    return connect.query(getAllPostsSql, []);
+}
+
 module.exports = {
     getPosts,
     insertPost,
@@ -49,5 +55,6 @@ module.exports = {
     getPost,
     updatePost,
     deletePost,
-    getPostsTotal
+    getPostsTotal,
+    getAllPosts
 };
