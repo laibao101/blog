@@ -20,7 +20,7 @@
         "redux-thunk": "^2.2.0",
         "rxjs": "^5.5.8",
         "simplemde": "^1.11.2",
-        "uuid": "^3.2.1",
+        "uuid": "^3.2.1"
     },
     "scripts": {
         "start": "react-scripts start",
