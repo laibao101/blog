@@ -24,16 +24,16 @@ server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({extended: false}));
 
 // session配置
-// server.use(session({
-//     secret: 'blog',
-//     proxy: true,
-//     resave: true,
-//     saveUninitialized: true,
-//     rolling: true,
-//     unset: 'destroy',
-//     cookie: {secure: false, httpOnly: true, maxAge: 1000 * 60 * 10},
-//     store: new MysqlStore(config)
-// }));
+server.use(session({
+    secret: 'blog',
+    proxy: true,
+    resave: true,
+    saveUninitialized: true,
+    rolling: true,
+    unset: 'destroy',
+    cookie: {secure: false, httpOnly: true, maxAge: 1000 * 60 * 10},
+    store: new MysqlStore(config)
+}));
 
 // passport配置
 const passportConfig = require('./config/passport');
