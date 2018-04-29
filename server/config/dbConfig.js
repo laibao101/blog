@@ -1,9 +1,9 @@
 module.exports = {
     mysql: {
-        host: "bdm259767216.my3w.com",
+        host: "sql12.freemysqlhosting.net",
         port: 3306,
-        database: "bdm259767216_db",
-        user: "bdm259767216",
-        password: "zhouhua369632"
+        database: "sql12235388",
+        user: "sql12235388",
+        password: "xsCcVDrjrB"
     }
 };

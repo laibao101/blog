@@ -4,6 +4,9 @@ import * as glob from 'glob';
 import * as logger from 'koa-morgan';
 import * as bodyParser from 'koa-bodyparser';
 import * as koaJwt from 'koa-jwt';
+import * as serve from 'koa-static';
+import * as path from 'path';
+
 import secret from './config/secret';
 
 enum ENV {
@@ -38,6 +41,7 @@ class App {
         this._port = this._getPort();
         this._env = this._getEnv();
         this._setParser();
+        this._app.use(serve(path.resolve('../build')));
         this._app.use(errorHandler);
         this._router = new Router();
         this._controllers = this._getControllers();
