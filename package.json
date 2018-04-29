@@ -52,7 +52,7 @@
         "xss": "^0.3.8"
     },
     "scripts": {
-        "start": "react-scripts build && nodemon  --exec ts-node ./server/src/app",
+        "start": "nodemon  --exec ts-node ./server/src/app",
         "start:dev": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test --env=jsdom",
