@@ -1,0 +1,22 @@
+{
+    "restartable": "rs",
+    "ignore": [
+        "*.js",
+        "node_modules/**/node_modules"
+    ],
+    "verbose": false,
+    "events": {
+        "start": "ts-node", 
+        "crash": "", 
+        "exit": "", 
+        "restart": "ts-node"
+    },
+    "watch": [
+        "src/"
+    ],
+    "env": {
+        "NODE_ENV": "dev",
+        "PORT": 5000
+    },
+    "ext": "ts"
+}

@@ -9,7 +9,7 @@ const server = express();
 
 // 跨域配置
 server.use(cors({
-    origin: 'http://localhost:3000',
+    origin: '*',
     credentials: true
 }));
 
@@ -50,11 +50,13 @@ controllers.forEach(function (controller) {
     require(controller.replace("./server", ".")).init(server);
 });
 
-server.listen(5000, (err) => {
+
+const port = process.env.PORT || 4500;
+server.listen(port, (err) => {
     if (err) {
         throw err;
     }
-    console.log('> Ready on http://localhost:5000');
+    console.log(`> Ready on http://localhost:${port}`);
 });
 
 module.exports = server;

@@ -1,0 +1,48 @@
+{
+    "name": "gulp-ts",
+    "version": "1.0.0",
+    "description": "",
+    "main": "gulpfile.js",
+    "scripts": {
+        "start": "nodemon  --exec ts-node ./src/app",
+        "build": "gulp compile"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "excel-export": "^0.5.1",
+        "glob": "^7.1.2",
+        "jsonwebtoken": "^8.2.1",
+        "koa": "^2.5.0",
+        "koa-bodyparser": "^4.2.0",
+        "koa-jwt": "^3.3.1",
+        "koa-morgan": "^1.0.1",
+        "koa-router": "^7.4.0",
+        "koa-static": "^4.0.2",
+        "md5": "^2.2.1",
+        "moment": "^2.22.1",
+        "mysql-pro": "^1.0.1",
+        "uuid": "^3.2.1",
+        "xss": "^0.3.8"
+    },
+    "devDependencies": {
+        "@types/glob": "^5.0.35",
+        "@types/jsonwebtoken": "^7.2.6",
+        "@types/koa": "^2.0.45",
+        "@types/koa-bodyparser": "^4.2.0",
+        "@types/koa-jwt": "^3.3.0",
+        "@types/koa-morgan": "^1.0.4",
+        "@types/koa-router": "^7.0.27",
+        "@types/md5": "^2.1.32",
+        "@types/uuid": "^3.4.3",
+        "cross-env": "^5.1.4",
+        "gulp": "^3.9.1",
+        "gulp-nodemon": "^2.2.1",
+        "gulp-sourcemaps": "^2.6.4",
+        "gulp-typescript": "^4.0.2",
+        "ts-node": "^5.0.1",
+        "tslint": "^5.9.1",
+        "typescript": "^2.8.1"
+    }
+}
